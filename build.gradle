@@ -18,6 +18,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+        //Repository voor de intent animation library
+        maven { url 'https://jitpack.io' }
     }
 }
 
