@@ -35,6 +35,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+        polyLineOptions = PolylineOptions()
         polyLineOptions.width(5f);
         polyLineOptions.color(Color.MAGENTA)
     }
@@ -51,7 +52,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
         controller.addLocation(location);
         drawMap();
     }
-    
+
     override fun onMapReady(googleMap: GoogleMap){
         map = googleMap
         line = map.addPolyline(polyLineOptions)
