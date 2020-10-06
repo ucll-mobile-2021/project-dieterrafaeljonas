@@ -47,16 +47,19 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
         polyLineOptions.color(Color.MAGENTA)
     }
 
-    private fun checkLocationPermission() {
+    private fun checkLocationPermission(): Boolean {
         // check if we already have location permission
         if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
             // if not ask for location permission
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),1);
         }
+
+        if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+            return true
+        return false
     }
 
-    @SuppressLint("MissingPermission")
-    fun startOnCurrentLocation(){
+    private fun startOnCurrentLocation(){
         if (ContextCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             locationProvider.lastLocation.addOnSuccessListener(this)
             { location ->
@@ -77,7 +80,8 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap){
         map = googleMap
         line = map.addPolyline(polyLineOptions)
-        checkLocationPermission()
+        if (checkLocationPermission())
+            map.isMyLocationEnabled = true
         val locationRequests = LocationRequest()
         locationRequests.interval = 5000
         locationRequests.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
