@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.projectmobiledev.R
 import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -50,6 +51,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
 
     override fun onLocationChanged(location: Location) {
         controller.addLocation(location);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),18f))
         drawMap();
     }
 
