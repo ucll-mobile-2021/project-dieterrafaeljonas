@@ -1,13 +1,16 @@
 package com.example.projectmobiledev.tracker
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
+import android.location.LocationManager
 import android.location.LocationProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -45,6 +48,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(5f);
         polyLineOptions.color(Color.MAGENTA)
+        val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        // if anyone is reading this i am going to fix this later but for now it works, you can just run this code
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
     }
 
     private fun checkLocationPermission(): Boolean {
@@ -72,6 +78,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
     }
 
     override fun onLocationChanged(location: Location) {
+        Log.d("locationListener","location updated")
         controller.addLocation(location);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),18f))
         drawMap();
