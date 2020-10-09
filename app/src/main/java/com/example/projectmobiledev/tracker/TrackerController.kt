@@ -18,4 +18,16 @@ class TrackerController() {
         return route.getAllLocations()
     }
 
+    fun addMarker(location: Location?){
+        route.addMarker(location);
+    }
+
+    fun removeMarker(location: Location?){
+        route.removeMarker(location);
+    }
+
+    fun getAllMarkers() : MutableList<Location>{
+        return route.getAllMarkers()
+    }
+
 }
