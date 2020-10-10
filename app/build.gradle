@@ -33,9 +33,9 @@ dependencies {
     // dependencies voor google maps
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    //Dependency voor de intent animation library
-    implementation 'com.github.hajiyevelnur92:intentanimation:1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    // Dependency voor nav drawer
+    implementation 'com.google.android.material:material:1.2.0-alpha04'
 }

@@ -1,5 +1,8 @@
 package com.example.projectmobiledev.tracker
 
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,8 +15,12 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.view.MenuItem
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,6 +34,10 @@ import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.CancellationToken
 import kotlinx.android.synthetic.main.tracker.*
 import java.lang.IllegalArgumentException
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.android.synthetic.main.tracker.*
 
 class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
 
@@ -36,6 +47,8 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
     private lateinit var line : Polyline
     private val controller : TrackerController = TrackerController()
     private lateinit var locationProvider : FusedLocationProviderClient
+
+    lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +69,22 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
         }
         btnCamera.setOnClickListener(cameraOnClick)
+
+        //Initialiseren van de toggle
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
+        //Toggle instellen als de knop waar op te klikken valt
+        drawerLayout.addDrawerListener(toggle)
+        //Toggle klaar zetten voor gebruik
+        toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        //Clicks op menu items afhandelen
+        nav_view.setNavigationItemSelectedListener {
+            when(it.itemId) {
+                R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
+                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
+            }
+            true
+        }
     }
 
     private fun updateCurrentLocation() {
@@ -123,5 +152,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
             }
             else -> throw IllegalStateException("Image error")
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

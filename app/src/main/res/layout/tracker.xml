@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
+    android:layout_height="match_parent"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -16,38 +20,49 @@
         map:layout_constraintTop_toTopOf="parent"
         tools:context=".tracker.Tracker" />
 
-    <Button
-        android:id="@+id/btnCamera"
+        <Button
+            android:id="@+id/btnCamera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            map:layout_constraintHorizontal_chainStyle="packed"
+            android:text="Take Picture"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toStartOf="@+id/btnStopTracking"
+            map:layout_constraintHorizontal_bias="0.106"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/map"
+            map:layout_constraintVertical_bias="1.0" />
+
+        <Button
+            android:id="@+id/btnStopTracking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            map:layout_constraintHorizontal_chainStyle="packed"
+            android:text="Stop tracking"
+            map:layout_constraintBottom_toBottomOf="parent"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/map"
+            map:layout_constraintVertical_bias="1.0" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="160dp"
+            android:layout_height="190dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toTopOf="parent"
+            map:srcCompat="@android:drawable/screen_background_dark_transparent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Navigation view toevoegen aan activity -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        map:layout_constraintHorizontal_chainStyle="packed"
-        android:text="Take Picture"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toStartOf="@+id/btnStopTracking"
-        map:layout_constraintHorizontal_bias="0.106"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toBottomOf="@+id/map"
-        map:layout_constraintVertical_bias="1.0" />
-
-    <Button
-        android:id="@+id/btnStopTracking"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        map:layout_constraintHorizontal_chainStyle="packed"
-        android:text="Stop tracking"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintTop_toBottomOf="@+id/map"
-        map:layout_constraintVertical_bias="1.0" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="160dp"
-        android:layout_height="190dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        map:srcCompat="@android:drawable/screen_background_dark_transparent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/nav_drawer"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true" />
+</androidx.drawerlayout.widget.DrawerLayout>
