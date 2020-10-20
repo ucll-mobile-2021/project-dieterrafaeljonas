@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -16,6 +17,9 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -37,9 +41,10 @@ import java.lang.IllegalArgumentException
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import kotlinx.android.synthetic.main.image_popup.*
 import kotlinx.android.synthetic.main.tracker.*
 
-class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
+class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var currentLocation : LatLng
     private lateinit var map: GoogleMap
@@ -47,13 +52,15 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
     private lateinit var line : Polyline
     private val controller : TrackerController = TrackerController()
     private lateinit var locationProvider : FusedLocationProviderClient
+    // dialog for image popup
+    private lateinit var popupDialog : Dialog
 
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
-
+        popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -108,7 +115,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
     }
 
     override fun onLocationChanged(location: Location) {
-        controller.addLocation(location);
+        controller.addLocation(LatLng(location.latitude,location.longitude));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),18f))
         drawMap();
         currentLocation = LatLng(location.latitude,location.longitude)
@@ -121,6 +128,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
         if (Permissions.checkLocationPermission(this)) {
             map.isMyLocationEnabled = true
         }
+        map.setOnMarkerClickListener(this);
     }
 
     private fun drawMap(){
@@ -143,11 +151,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
             0 -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     // set the image in the imageView
-                    imageView.setImageBitmap(data.extras?.get("data") as Bitmap)
+                    val image = data.extras?.get("data") as Bitmap
                     // only add the marker when the picture is actually taken
                     val marker = MarkerOptions()
                     marker.position(LatLng(currentLocation.latitude,currentLocation.longitude));
                     map.addMarker(marker)
+                    controller.addMarker(currentLocation,image);
                 }
             }
             else -> throw IllegalStateException("Image error")
@@ -159,5 +168,24 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onMarkerClick(marker: Marker?): Boolean {
+        if (marker != null) {
+            val markers = controller.getAllMarkers()
+            val markerlatLng: LatLng? = marker.position
+            for (markerEntry in markers) {
+                if (markerEntry.key == markerlatLng){
+                    // found the right marker
+                    // show image on popup
+                    popupDialog.setContentView(R.layout.image_popup)
+                    popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
+                    popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener { popupDialog.dismiss() }
+                    popupDialog.show()
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

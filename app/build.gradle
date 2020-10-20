@@ -40,7 +40,9 @@ dependencies {
     // Dependency voor nav drawer
     implementation 'com.google.android.material:material:1.2.0-alpha04'
     // Import the BoM for the Firebase platform
+    //implementation 'com.google.firebase:firebase-database:19.5.0'
     implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
     // Declare the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'

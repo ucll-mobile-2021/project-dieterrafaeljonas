@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "630312645564",
+    "firebase_url": "https://promenapp.firebaseio.com",
+    "project_id": "promenapp",
+    "storage_bucket": "promenapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630312645564:android:1ccda2c2980e880c1af1b9",
+        "android_client_info": {
+          "package_name": "com.example.projectmobiledev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630312645564-fs0aa8fqtdutn5td56atlc6gl866eu5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyBPqJO_kC91j0bLFnBJwnctYqb52E3PE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630312645564-fs0aa8fqtdutn5td56atlc6gl866eu5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

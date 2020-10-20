@@ -1,32 +1,34 @@
 package com.example.projectmobiledev.tracker
 
+import android.graphics.Bitmap
 import android.location.Location
+import com.google.android.gms.maps.model.LatLng
 
 class TrackerController() {
     private val route : TrackerModel = TrackerModel()
 
 
-    fun addLocation(location: Location?){
+    fun addLocation(location: LatLng?){
         route.addLocation(location);
     }
 
-    fun removeLocation(location: Location?){
+    fun removeLocation(location: LatLng?){
         route.removeLocation(location);
     }
 
-    fun getAllLocations() : MutableList<Location>{
+    fun getAllLocations() : MutableList<LatLng>{
         return route.getAllLocations()
     }
 
-    fun addMarker(location: Location?){
-        route.addMarker(location);
+    fun addMarker(location: LatLng?,bitmap: Bitmap){
+        route.addMarker(location,bitmap);
     }
 
-    fun removeMarker(location: Location?){
+    fun removeMarker(location: LatLng?){
         route.removeMarker(location);
     }
 
-    fun getAllMarkers() : MutableList<Location>{
+    fun getAllMarkers() : MutableMap<LatLng,Bitmap>{
         return route.getAllMarkers()
     }
 
