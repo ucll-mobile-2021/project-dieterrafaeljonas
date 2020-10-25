@@ -44,7 +44,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.android.synthetic.main.image_popup.*
 import kotlinx.android.synthetic.main.tracker.*
 
-class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private lateinit var currentLocation : LatLng
     private lateinit var map: GoogleMap
@@ -67,14 +67,26 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         mapFragment.getMapAsync(this)
 
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
-
         polyLineOptions = PolylineOptions()
-        polyLineOptions.width(9f);
+        polyLineOptions.width(9f)
         polyLineOptions.color(Color.MAGENTA)
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         if(Permissions.checkLocationPermission(this)){
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
+        }else{
+            Permissions.askLocationPermission(this);
         }
+
+        // Callback function which executes when user confirms location permission
+//        ActivityCompat.OnRequestPermissionsResultCallback { requestCode, permissions, grantResults ->
+//            if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
+//                if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18f))
+//                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
+//                }
+//            }
+//        }
+
         btnCamera.setOnClickListener(cameraOnClick)
 
         //Initialiseren van de toggle
@@ -91,6 +103,20 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
             }
             true
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
+            if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                map.isMyLocationEnabled = true
+                updateCurrentLocation()
+                if (Permissions.checkLocationPermission(this)){ // geen idee waarom ik dit hier moet zetten want ik zit letterlijk in een PermissionResult callback :confused:
+                    val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
+                }
+            }
         }
     }
 
@@ -115,10 +141,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     }
 
     override fun onLocationChanged(location: Location) {
-        controller.addLocation(LatLng(location.latitude,location.longitude));
+        controller.addLocation(LatLng(location.latitude,location.longitude))
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),18f))
-        drawMap();
+        drawMap()
         currentLocation = LatLng(location.latitude,location.longitude)
+        val distance = controller.getTotalDistance()
+        println(distance)
     }
 
     override fun onMapReady(googleMap: GoogleMap){
@@ -128,7 +156,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         if (Permissions.checkLocationPermission(this)) {
             map.isMyLocationEnabled = true
         }
-        map.setOnMarkerClickListener(this);
+        map.setOnMarkerClickListener(this)
     }
 
     private fun drawMap(){
@@ -154,9 +182,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     val image = data.extras?.get("data") as Bitmap
                     // only add the marker when the picture is actually taken
                     val marker = MarkerOptions()
-                    marker.position(LatLng(currentLocation.latitude,currentLocation.longitude));
+                    marker.position(LatLng(currentLocation.latitude,currentLocation.longitude))
                     map.addMarker(marker)
-                    controller.addMarker(currentLocation,image);
+                    controller.addMarker(currentLocation,image)
                 }
             }
             else -> throw IllegalStateException("Image error")

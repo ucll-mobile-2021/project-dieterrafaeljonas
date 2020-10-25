@@ -32,4 +32,8 @@ class TrackerController() {
         return route.getAllMarkers()
     }
 
+    fun getTotalDistance() : Float{
+        return route.getTotalDistance();
+    }
+
 }

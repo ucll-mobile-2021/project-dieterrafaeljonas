@@ -10,39 +10,44 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="644dp"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        tools:context=".tracker.Tracker" />
 
-        <Button
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintVertical_bias="0.0"
+            map:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toTopOf="parent"
+            tools:context=".tracker.Tracker" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnCamera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            map:layout_constraintHorizontal_chainStyle="packed"
-            android:text="Take Picture"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toStartOf="@+id/btnStopTracking"
-            map:layout_constraintHorizontal_bias="0.106"
-            map:layout_constraintStart_toStartOf="parent"
-            map:layout_constraintTop_toBottomOf="@+id/map"
-            map:layout_constraintVertical_bias="1.0" />
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/colorAccent"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            map:srcCompat="@android:drawable/ic_menu_camera" />
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnStopTracking"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            map:layout_constraintHorizontal_chainStyle="packed"
-            android:text="Stop tracking"
-            map:layout_constraintBottom_toBottomOf="parent"
-            map:layout_constraintEnd_toEndOf="parent"
-            map:layout_constraintTop_toBottomOf="@+id/map"
-            map:layout_constraintVertical_bias="1.0" />
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
+            android:backgroundTint="@color/colorAccent"
+            android:clickable="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/stop_tracking"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

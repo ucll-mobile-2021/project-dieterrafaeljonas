@@ -37,4 +37,22 @@ class TrackerModel() {
         return markers;
     }
 
+    fun getTotalDistance() : Float {
+        var totalDistance = 0.0f
+        if (route.size > 1) {
+            val floatArray = floatArrayOf(1.0f)
+            for (i in 0 until route.size - 1) {
+                Location.distanceBetween(
+                    route[i].latitude,
+                    route[i].longitude,
+                    route[i + 1].latitude,
+                    route[i + 1].longitude,
+                    floatArray
+                );
+                totalDistance += floatArray[0];
+            }
+        }
+        return totalDistance;
+    }
+
 }
