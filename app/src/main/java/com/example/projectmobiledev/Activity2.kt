@@ -6,7 +6,10 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.tracker.Tracker
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.tracker.*
 
 class Activity2 : AppCompatActivity() {
@@ -30,6 +33,10 @@ class Activity2 : AppCompatActivity() {
             when(it.itemId) {
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
+                R.id.LogOut -> {
+                    Firebase.auth.signOut()
+                    startActivity(Intent(this, LogIn::class.java))
+                }
             }
             true
         }

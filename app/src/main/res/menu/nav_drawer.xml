@@ -3,7 +3,7 @@
 
     <item android:id="@+id/Tracker" android:title="Tracker" android:icon="@drawable/nav_tracker"/>
     <item android:id="@+id/Example" android:title="Example" android:icon="@drawable/nav_example"/>
-
+    <item android:id="@+id/LogOut" android:title="Log Out" android:icon="@drawable/log_out" />
     <!-- Meerdere items kunnen nog worden toegevoegd -->
 
 </menu>

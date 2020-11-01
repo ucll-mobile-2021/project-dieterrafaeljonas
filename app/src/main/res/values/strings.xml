@@ -3,4 +3,5 @@
     <!-- Toeveogen van strings voor blinde mensen bij het initialiseren van toggle -->
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="title_activity_logged_in">Authenticated</string>
 </resources>
