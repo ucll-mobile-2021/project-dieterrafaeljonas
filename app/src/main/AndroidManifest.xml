@@ -23,8 +23,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".tracker.Tracker" />
-        <!-- Voorbeeld activity toegevoegd -->
-        <activity android:name=".Activity2" />
+        <activity android:name=".profile.Profile" />
     </application>
 
 </manifest>

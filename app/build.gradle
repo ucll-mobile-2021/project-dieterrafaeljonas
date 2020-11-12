@@ -48,5 +48,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
+    //Voor het zetten van imageviews aan de hand van url's
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    //Rounded image view
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 }
 apply plugin: 'com.google.gms.google-services'

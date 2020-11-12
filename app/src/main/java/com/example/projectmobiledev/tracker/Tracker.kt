@@ -28,6 +28,7 @@ import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.login.LogIn
+import com.example.projectmobiledev.profile.Profile
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
@@ -42,6 +43,7 @@ import java.lang.IllegalArgumentException
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.image_popup.*
@@ -94,6 +96,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             when(it.itemId) {
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
+                R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))
