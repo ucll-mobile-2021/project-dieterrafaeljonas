@@ -3,11 +3,14 @@ package com.example.projectmobiledev.tracker
 import android.graphics.Bitmap
 import android.location.Location
 import com.google.android.gms.maps.model.LatLng
+import java.sql.Time
 
 class TrackerModel() {
     private val route = mutableListOf<LatLng>()
     //private val markers = mutableListOf<Location>()
     private val markers = mutableMapOf<LatLng,Bitmap>()
+    private var totalDistance = 0.0f;
+    private var totalTime = Time(0,0,0);
 
     fun addLocation(location : LatLng?){
         if (location != null)
@@ -52,6 +55,7 @@ class TrackerModel() {
                 totalDistance += floatArray[0];
             }
         }
+        this@TrackerModel.totalDistance = totalDistance;
         return totalDistance;
     }
 

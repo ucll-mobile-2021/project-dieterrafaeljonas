@@ -80,16 +80,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             Permissions.askLocationPermission(this);
         }
 
-        // Callback function which executes when user confirms location permission
-//        ActivityCompat.OnRequestPermissionsResultCallback { requestCode, permissions, grantResults ->
-//            if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
-//                if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18f))
-//                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
-//                }
-//            }
-//        }
-
         btnCamera.setOnClickListener(cameraOnClick)
 
         //Initialiseren van de toggle
