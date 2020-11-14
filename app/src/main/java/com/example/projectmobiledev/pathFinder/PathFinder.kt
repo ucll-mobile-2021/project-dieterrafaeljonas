@@ -199,6 +199,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     }
 
     override fun onLocationChanged(p0: Location) {
-        TODO("Not yet implemented")
+        //doe tot nu toe nix
+
     }
 }

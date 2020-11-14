@@ -7,6 +7,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
+
 import com.example.projectmobiledev.profile.Profile
 import com.example.projectmobiledev.tracker.Tracker
 import com.google.firebase.auth.ktx.auth
