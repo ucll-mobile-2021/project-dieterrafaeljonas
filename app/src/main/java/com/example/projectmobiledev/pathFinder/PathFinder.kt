@@ -1,8 +1,12 @@
 package com.example.projectmobiledev.pathFinder
 
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -10,10 +14,13 @@ import android.view.MenuItem
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.Activity2
+import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.profile.Profile
 import com.example.projectmobiledev.tracker.Tracker
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -27,7 +34,7 @@ import kotlinx.android.synthetic.main.tracker.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class PathFinder : AppCompatActivity(), OnMapReadyCallback {
+class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     lateinit var mapFragment : SupportMapFragment
     lateinit var map: GoogleMap
@@ -35,6 +42,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var pointFrom: LatLng
     private lateinit var pointTo: LatLng
     private var firstPointSelected: Boolean = false
+    private lateinit var locationProvider : FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +51,14 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        locationProvider = LocationServices.getFusedLocationProviderClient(this)
+        val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        if(Permissions.checkLocationPermission(this)){
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f,this)
+        }else{
+            Permissions.askLocationPermission(this)
+        }
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         //Toggle instellen als de knop waar op te klikken valt
@@ -178,6 +194,11 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback {
             pointTo = LatLng(it.latitude, it.longitude)
             var URL = getDirectionURL(pointFrom,pointTo)
             GetDirection(URL).execute()
+            firstPointSelected = false
         }
+    }
+
+    override fun onLocationChanged(p0: Location) {
+        TODO("Not yet implemented")
     }
 }
