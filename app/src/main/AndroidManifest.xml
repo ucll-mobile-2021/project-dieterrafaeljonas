@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".tracker.Tracker" />
         <activity android:name=".profile.Profile" />
+        <activity android:name=".pathFinder.PathFinder"/>
     </application>
 
 </manifest>

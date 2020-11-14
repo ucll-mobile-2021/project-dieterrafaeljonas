@@ -1,8 +1,5 @@
 package com.example.projectmobiledev.tracker
 
-import android.annotation.SuppressLint
-import android.app.Application
-import android.content.Context
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -14,40 +11,32 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.login.LogIn
+import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.tasks.CancellationToken
 import kotlinx.android.synthetic.main.tracker.*
-import java.lang.IllegalArgumentException
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.image_popup.*
-import kotlinx.android.synthetic.main.tracker.*
 
 class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -97,6 +86,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
+                R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))

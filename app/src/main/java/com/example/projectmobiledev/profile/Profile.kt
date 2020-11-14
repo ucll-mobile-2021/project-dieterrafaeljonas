@@ -1,7 +1,6 @@
 package com.example.projectmobiledev.profile
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
@@ -9,6 +8,7 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.Activity2
+import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.tracker.Tracker
@@ -50,6 +50,7 @@ class Profile : AppCompatActivity() {
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
+                R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))
