@@ -22,21 +22,40 @@ import kotlinx.android.synthetic.main.tracker.*
 
 
 class Profile : AppCompatActivity() {
-    lateinit var toggle: ActionBarDrawerToggle
+    private lateinit var toggle: ActionBarDrawerToggle
+    private val controller: ProfileController = ProfileController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile)
 
-        val user = FirebaseAuth.getInstance().currentUser
+        /*
+        ##########################
+        ## Setten van main info ##
+        ##########################
+         */
         val username : TextView = findViewById(R.id.username)
         val profilepic : ImageView = findViewById(R.id.profilepicture)
-        if (user != null) {
-            username.text = user.email
-            val transformation: Transformation = RoundedTransformationBuilder().cornerRadiusDp(200f).oval(true).build()
-            Picasso.get().load(user.photoUrl).fit().transform(transformation).into(profilepic)
-        }
+        username.text = controller.getUserEmail()
+        val transformation: Transformation = RoundedTransformationBuilder().cornerRadiusDp(200f).oval(true).build()
+        Picasso.get().load(controller.getUserProfilePictureURI()).fit().transform(transformation).into(profilepic)
 
+        /*
+        ########################
+        ## Setten van totalen ##
+        ########################
+         */
+        val tot_km : TextView = findViewById(R.id.totale_km)
+        val tot_w : TextView = findViewById(R.id.totale_wandelingen)
+        // Not implemented yet
+        // tot_km.text = controller.getUserWalkedHikes().toString()
+        // tot_w.text = controller.getUserWalkedHikes().toString()
+
+        /*
+        ##############################
+        ## Setup voor de navigation ##
+        ##############################
+         */
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         //Toggle instellen als de knop waar op te klikken valt
