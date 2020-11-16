@@ -1,12 +1,13 @@
 package com.example.projectmobiledev.tracker
 
 import android.graphics.Bitmap
-import android.location.Location
 import com.example.projectmobiledev.Time
+import com.example.projectmobiledev.database.Database
 import com.google.android.gms.maps.model.LatLng
 
 class TrackerController() {
     private val route : TrackerModel = TrackerModel()
+    private val database: Database = Database()
 
     fun startTracking(){
         route.start()
@@ -21,7 +22,7 @@ class TrackerController() {
     }
 
     fun getAllLocations() : MutableList<LatLng>{
-        return route.getAllLocations()
+        return route.getLocations()
     }
 
     fun addMarker(location: LatLng?,bitmap: Bitmap){
@@ -46,6 +47,14 @@ class TrackerController() {
 
     fun getElapsedTime(): Time {
         return route.getElapsedTime()
+    }
+
+    fun writeToDatabase() {
+        database.writeRoute(route)
+    }
+
+    fun getGuid(): String {
+        return route.guid.toString()
     }
 
 }

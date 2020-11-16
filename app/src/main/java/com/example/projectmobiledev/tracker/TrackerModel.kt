@@ -4,17 +4,27 @@ import android.graphics.Bitmap
 import android.location.Location
 import com.example.projectmobiledev.Time
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.Exclude
 import java.util.*
 
 class TrackerModel() {
+    var guid: UUID = UUID.randomUUID()
+    lateinit var userEmail: String
+        private set
     private val route = mutableListOf<LatLng>()
-    //private val markers = mutableListOf<Location>()
+    @Exclude
+    @get:Exclude
     private val markers = mutableMapOf<LatLng,Bitmap>()
     private var totalDistance = 0.0f;
-    private lateinit var startDate : Date
-    private var  endDate : Date? = null
+    lateinit var startDate : Date
+        private set
+    var  endDate : Date? = null
+        private set
 
     fun start(){
+        val user = FirebaseAuth.getInstance().currentUser;
+        userEmail = user?.email!!
         startDate = Calendar.getInstance().time
     }
 
@@ -34,7 +44,7 @@ class TrackerModel() {
             route.remove(location)
     }
 
-    fun getAllLocations(): MutableList<LatLng> {
+    fun getLocations(): MutableList<LatLng> {
         return route;
     }
 
