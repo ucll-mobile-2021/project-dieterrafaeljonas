@@ -12,7 +12,6 @@ import com.example.projectmobiledev.R
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.tracker.Tracker
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
@@ -45,8 +44,8 @@ class Profile : AppCompatActivity() {
         ## Setten van totalen ##
         ########################
          */
-        val tot_km : TextView = findViewById(R.id.totale_km)
-        val tot_w : TextView = findViewById(R.id.totale_wandelingen)
+        val tot_km : TextView = findViewById(R.id.amount_of_hikes)
+        val tot_w : TextView = findViewById(R.id.total_kilometers)
         // Not implemented yet
         // tot_km.text = controller.getUserWalkedHikes().toString()
         // tot_w.text = controller.getUserWalkedHikes().toString()

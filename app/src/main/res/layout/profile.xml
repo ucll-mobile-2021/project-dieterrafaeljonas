@@ -7,133 +7,235 @@
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <ScrollView
+        android:fillViewport="true"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:id="@+id/header"
+                android:layout_width="0dp"
+                android:layout_height="93dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="#81c27a"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.08" />
+
+            <View
+                android:id="@+id/algemene_info"
+                android:layout_width="0dp"
+                android:layout_height="93dp"
+                android:background="#81c27a"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/header"
+                app:layout_constraintStart_toStartOf="@+id/header"
+                app:layout_constraintTop_toBottomOf="@+id/header"
+                app:layout_constraintVertical_bias="0.06999999" />
+
+            <View
+                android:id="@+id/langste_wandeling"
+                android:layout_width="0dp"
+                android:layout_height="327dp"
+                android:background="#81c27a"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/algemene_info"
+                app:layout_constraintStart_toStartOf="@+id/algemene_info"
+                app:layout_constraintTop_toBottomOf="@+id/algemene_info"
+                app:layout_constraintVertical_bias="0.3" />
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/profilepicture"
+                android:layout_width="106dp"
+                android:layout_height="96dp"
+                android:scaleType="centerInside"
+                tools:layout_editor_absoluteX="152dp"
+                tools:layout_editor_absoluteY="13dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.01999998"/>
+
+            <TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="176dp"
+                tools:layout_editor_absoluteY="121dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profilepicture"
+                app:layout_constraintVertical_bias="0.01999998"/>
+
+            <TextView
+                android:id="@+id/total_kilometers_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total kilometers"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
+                app:layout_constraintEnd_toEndOf="@+id/algemene_info"
+                app:layout_constraintHorizontal_bias="0.2"
+                app:layout_constraintStart_toStartOf="@+id/algemene_info"
+                app:layout_constraintTop_toTopOf="@+id/algemene_info"
+                app:layout_constraintVertical_bias="0.29000002" />
+
+            <TextView
+                android:id="@+id/amount_of_hikes_header"
+                android:layout_width="110dp"
+                android:layout_height="18dp"
+                android:text="Amount of hikes"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
+                app:layout_constraintEnd_toEndOf="@+id/algemene_info"
+                app:layout_constraintHorizontal_bias="0.8"
+                app:layout_constraintStart_toStartOf="@+id/algemene_info"
+                app:layout_constraintTop_toTopOf="@+id/algemene_info"
+                app:layout_constraintVertical_bias="0.29000002" />
+
+            <TextView
+                android:id="@+id/amount_of_hikes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="32"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
+                app:layout_constraintEnd_toEndOf="@+id/amount_of_hikes_header"
+                app:layout_constraintHorizontal_bias="0.49"
+                app:layout_constraintStart_toStartOf="@+id/amount_of_hikes_header"
+                app:layout_constraintTop_toTopOf="@+id/algemene_info"
+                app:layout_constraintVertical_bias="0.9" />
+
+            <TextView
+                android:id="@+id/total_kilometers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3"
+                android:textAlignment="viewStart"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
+                app:layout_constraintEnd_toEndOf="@+id/total_kilometers_header"
+                app:layout_constraintStart_toStartOf="@+id/total_kilometers_header"
+                app:layout_constraintTop_toTopOf="@+id/algemene_info"
+                app:layout_constraintVertical_bias="0.9" />
 
 
-        <View
-            android:id="@+id/header"
-            android:layout_width="380dp"
-            android:layout_height="93dp"
-            android:background="#81c27a"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/rechts"
-            app:layout_constraintHorizontal_bias="0.402"
-            app:layout_constraintStart_toStartOf="@+id/links"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.08" />
+            <fragment
+                android:id="@+id/longest_hike"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/langste_wandeling"
+                app:layout_constraintStart_toStartOf="@+id/langste_wandeling"
+                app:layout_constraintTop_toTopOf="@+id/langste_wandeling"
+                app:layout_constraintVertical_bias="0.32"
+                tools:context=".tracker.Tracker" />
 
-        <View
-            android:id="@+id/algemene_info"
-            android:layout_width="380dp"
-            android:layout_height="93dp"
-            android:background="#81c27a"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/rechts"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/links"
-            app:layout_constraintTop_toBottomOf="@+id/header"
-            app:layout_constraintVertical_bias="0.06" />
+            <TextView
+                android:id="@+id/longest_hike_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Longest hike"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/longest_hike"
+                app:layout_constraintEnd_toEndOf="@+id/langste_wandeling"
+                app:layout_constraintStart_toStartOf="@+id/langste_wandeling"
+                app:layout_constraintTop_toTopOf="@+id/langste_wandeling" />
 
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:id="@+id/profilepicture"
-            android:layout_width="106dp"
-            android:layout_height="96dp"
-            android:scaleType="centerInside"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.01999998" />
+            <TextView
+                android:id="@+id/longest_hike_km_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kilometers:"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/langste_wandeling"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintStart_toStartOf="@+id/langste_wandeling"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike"
+                app:layout_constraintVertical_bias="0.39" />
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profilepicture"
-            app:layout_constraintVertical_bias="0.01999998" />
+            <TextView
+                android:id="@+id/longest_hike_time_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time:"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toStartOf="@+id/longest_hike_avg_speed_header"
+                app:layout_constraintStart_toEndOf="@+id/longest_hike_km_header"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike"
+                app:layout_constraintVertical_bias="0.39" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/links"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="16dp" />
+            <TextView
+                android:id="@+id/longest_hike_avg_speed_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Avg speed:"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/langste_wandeling"
+                app:layout_constraintHorizontal_bias="0.9"
+                app:layout_constraintStart_toStartOf="@+id/langste_wandeling"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike"
+                app:layout_constraintVertical_bias="0.39" />
 
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/rechts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="395dp" />
+            <TextView
+                android:id="@+id/longest_hike_km"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2.4"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/longest_hike_km_header"
+                app:layout_constraintStart_toStartOf="@+id/longest_hike_km_header"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike_km_header" />
 
-        <TextView
-            android:id="@+id/totale_km_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Total kilometers"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
-            app:layout_constraintEnd_toEndOf="@+id/algemene_info"
-            app:layout_constraintHorizontal_bias="0.14"
-            app:layout_constraintStart_toStartOf="@+id/links"
-            app:layout_constraintTop_toTopOf="@+id/algemene_info"
-            app:layout_constraintVertical_bias="0.22000003" />
+            <TextView
+                android:id="@+id/longest_hike_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0:10"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/longest_hike_time_header"
+                app:layout_constraintStart_toStartOf="@+id/longest_hike_time_header"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike_time_header" />
 
-        <TextView
-            android:id="@+id/totale_wandelingen_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Amount of hikes"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
-            app:layout_constraintEnd_toEndOf="@+id/algemene_info"
-            app:layout_constraintHorizontal_bias="0.86"
-            app:layout_constraintStart_toStartOf="@+id/algemene_info"
-            app:layout_constraintTop_toTopOf="@+id/algemene_info"
-            app:layout_constraintVertical_bias="0.22000003" />
-
-        <TextView
-            android:id="@+id/totale_km"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="21dp"
-            android:text="32"
-            android:textColor="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
-            app:layout_constraintEnd_toEndOf="@+id/algemene_info"
-            app:layout_constraintHorizontal_bias="0.22"
-            app:layout_constraintStart_toStartOf="@+id/algemene_info"
-            app:layout_constraintTop_toBottomOf="@+id/totale_km_header"
-            app:layout_constraintVertical_bias="0.060000002" />
-
-        <TextView
-            android:id="@+id/totale_wandelingen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="21dp"
-            android:text="3"
-            android:textAlignment="viewStart"
-            android:textColor="#FFFFFF"
-            app:layout_constraintBottom_toBottomOf="@+id/algemene_info"
-            app:layout_constraintEnd_toStartOf="@+id/rechts"
-            app:layout_constraintHorizontal_bias="0.76"
-            app:layout_constraintStart_toStartOf="@+id/algemene_info"
-            app:layout_constraintTop_toBottomOf="@+id/totale_wandelingen_header"
-            app:layout_constraintVertical_bias="0.060000002" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/longest_hike_avg_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10 km/s"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="@+id/langste_wandeling"
+                app:layout_constraintEnd_toEndOf="@+id/longest_hike_avg_speed_header"
+                app:layout_constraintStart_toStartOf="@+id/longest_hike_avg_speed_header"
+                app:layout_constraintTop_toBottomOf="@+id/longest_hike_avg_speed_header" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
     <!-- Navigation view toevoegen aan activity -->
     <com.google.android.material.navigation.NavigationView
