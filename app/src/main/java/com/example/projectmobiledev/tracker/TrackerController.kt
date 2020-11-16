@@ -2,11 +2,15 @@ package com.example.projectmobiledev.tracker
 
 import android.graphics.Bitmap
 import android.location.Location
+import com.example.projectmobiledev.Time
 import com.google.android.gms.maps.model.LatLng
 
 class TrackerController() {
     private val route : TrackerModel = TrackerModel()
 
+    fun startTracking(){
+        route.start()
+    }
 
     fun addLocation(location: LatLng?){
         route.addLocation(location);
@@ -34,6 +38,14 @@ class TrackerController() {
 
     fun getTotalDistance() : Float{
         return route.getTotalDistance();
+    }
+
+    fun stopTracking() {
+        route.end()
+    }
+
+    fun getElapsedTime(): Time {
+        return route.getElapsedTime()
     }
 
 }

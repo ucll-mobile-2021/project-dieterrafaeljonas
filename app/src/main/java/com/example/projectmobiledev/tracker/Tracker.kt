@@ -11,6 +11,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.MenuItem
 import android.widget.ImageButton
@@ -52,6 +53,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        controller.startTracking()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
         popupDialog = Dialog(this)
@@ -94,6 +96,13 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             }
             true
         }
+
+        btnStopTracking.setOnClickListener{
+            controller.stopTracking()
+            Log.d("Time",controller.getElapsedTime().toString())
+            // TODO write to database
+        }
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray) {

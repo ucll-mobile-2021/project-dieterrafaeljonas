@@ -2,19 +2,31 @@ package com.example.projectmobiledev.tracker
 
 import android.graphics.Bitmap
 import android.location.Location
+import com.example.projectmobiledev.Time
 import com.google.android.gms.maps.model.LatLng
-import java.sql.Time
+import java.util.*
 
 class TrackerModel() {
     private val route = mutableListOf<LatLng>()
     //private val markers = mutableListOf<Location>()
     private val markers = mutableMapOf<LatLng,Bitmap>()
     private var totalDistance = 0.0f;
-    private var totalTime = Time(0,0,0);
+    private lateinit var startDate : Date
+    private var  endDate : Date? = null
+
+    fun start(){
+        startDate = Calendar.getInstance().time
+    }
+
+    fun end(){
+        endDate = Calendar.getInstance().time;
+    }
 
     fun addLocation(location : LatLng?){
-        if (location != null)
+        if (location != null){
             route.add(location)
+            calculateDistance()
+        }
     }
 
     fun removeLocation(location: LatLng?){
@@ -40,7 +52,23 @@ class TrackerModel() {
         return markers;
     }
 
-    fun getTotalDistance() : Float {
+    fun getTotalDistance(): Float {
+        return totalDistance;
+    }
+
+    fun getElapsedTime() : Time {
+        if (endDate != null){
+            val elapsedTime = endDate?.time?.minus(startDate.time);
+            return Time(elapsedTime!!)
+        }
+        else{
+            // if the route hasn't ended yet return current elapsed time
+            val elapsedTime = Calendar.getInstance().time.time.minus(startDate.time);
+            return Time(elapsedTime)
+        }
+    }
+
+    fun calculateDistance() {
         var totalDistance = 0.0f
         if (route.size > 1) {
             val floatArray = floatArrayOf(1.0f)
@@ -56,7 +84,6 @@ class TrackerModel() {
             }
         }
         this@TrackerModel.totalDistance = totalDistance;
-        return totalDistance;
     }
 
 }
