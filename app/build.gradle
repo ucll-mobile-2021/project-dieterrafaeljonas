@@ -48,6 +48,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
+    // firestore dependenecies
+//    implementation platform('com.google.firebase:firebase-bom:26.1.0')
+//    implementation 'com.google.firebase:firebase-firestore-ktx'
+    // storage dependencies
+    implementation 'com.google.firebase:firebase-storage-ktx'
     //Voor het zetten van imageviews aan de hand van url's
     implementation 'com.squareup.picasso:picasso:2.71828'
     //Rounded image view

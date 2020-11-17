@@ -1,14 +1,19 @@
 package com.example.projectmobiledev.database
+import android.graphics.Bitmap
+import android.util.Log
 import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.*
+import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.util.*
 
 class Database() {
     private val database = FirebaseDatabase.getInstance()
+    private val storage = FirebaseStorage.getInstance()
 
     fun getAll(callback: RoutesCallback){
         val valueEventListener = object : ValueEventListener {
@@ -43,12 +48,21 @@ class Database() {
         routes.child(route.guid.toString()).child("endDate").setValue(route.endDate)
 
         //TODO(write markers)
+        val images  = storage.getReference("/Images")
+        val currentRouteImages = images.child(route.guid.toString())
+
         var teller = 0
         for ((k,v) in route.getAllMarkers()){
-            val value :String = "PromenApp_${route.guid}_${k.latitude}_${k.longitude}.JPG"
-            routes.child(route.guid.toString()).child("markers").child(teller.toString()).child("latitude").setValue(k.latitude)
-            routes.child(route.guid.toString()).child("markers").child(teller.toString()).child("longitude").setValue(k.longitude)
-            routes.child(route.guid.toString()).child("markers").child(teller.toString()).child("image").setValue(value)
+            val value = "PromenApp_${route.guid}_${k.latitude}_${k.longitude}.JPG"
+            val baos = ByteArrayOutputStream()
+            v.compress(Bitmap.CompressFormat.JPEG,100,baos)
+            val data = baos.toByteArray()
+            currentRouteImages.child(value).putBytes(data)
+                .addOnFailureListener{
+                    Log.d("Storage", "something has gone wrong")
+                }.addOnSuccessListener {
+                    Log.d("Storage", "Image uploaded succesfully")
+                }
             teller++
         }
     }
