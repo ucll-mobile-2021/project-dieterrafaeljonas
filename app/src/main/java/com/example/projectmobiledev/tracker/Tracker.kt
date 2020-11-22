@@ -24,6 +24,7 @@ import androidx.core.graphics.createBitmap
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
@@ -59,7 +60,15 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        getImages()
+        val callback = object : RoutesCallback {
+            override fun callback(routes: List<TrackerModel>) {
+                for (route in routes){
+                    Log.d("Route", route.toString())
+                }
+            }
+        }
+
+        controller.getAll(callback)
         controller.startTracking()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
@@ -106,19 +115,13 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
         btnStopTracking.setOnClickListener{
             // First save all the images
-            saveImages()
+            // saveImages() // this is used for storing images locally
             controller.stopTracking()
             Log.d("Time",controller.getElapsedTime().toString())
             controller.writeToDatabase()
             Log.d("DB", "Written to database")
         }
 
-    }
-
-    private fun getImages() : Boolean{
-        val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val files = storagedir?.listFiles()
-        return false
     }
 
     private fun saveImages() : Boolean {

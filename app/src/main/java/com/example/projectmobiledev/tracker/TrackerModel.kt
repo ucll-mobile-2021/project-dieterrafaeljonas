@@ -9,18 +9,13 @@ import com.google.firebase.database.Exclude
 import java.util.*
 
 class TrackerModel() {
-    var guid: UUID = UUID.randomUUID()
+    var guid: UUID? = UUID.randomUUID()
     lateinit var userEmail: String
-        private set
     private val route = mutableListOf<LatLng>()
-    @Exclude
-    @get:Exclude
     private val markers = mutableMapOf<LatLng,Bitmap>()
     private var totalDistance = 0.0f;
     lateinit var startDate : Date
-        private set
     var  endDate : Date? = null
-        private set
 
     fun start(){
         val user = FirebaseAuth.getInstance().currentUser;
@@ -95,5 +90,15 @@ class TrackerModel() {
         }
         this@TrackerModel.totalDistance = totalDistance;
     }
+
+    override fun toString(): String {
+        return "TrackerModel(guid=$guid, userEmail='$userEmail', route=$route, totalDistance=$totalDistance, startDate=$startDate, endDate=$endDate)"
+    }
+
+    fun setLocations(locations: MutableList<LatLng>) {
+        route.clear()
+        route.addAll(locations)
+    }
+
 
 }

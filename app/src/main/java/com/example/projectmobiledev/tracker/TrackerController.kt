@@ -3,6 +3,7 @@ package com.example.projectmobiledev.tracker
 import android.graphics.Bitmap
 import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
+import com.example.projectmobiledev.database.RoutesCallback
 import com.google.android.gms.maps.model.LatLng
 
 class TrackerController() {
@@ -51,6 +52,10 @@ class TrackerController() {
 
     fun writeToDatabase() {
         database.writeRoute(route)
+    }
+
+    fun getAll(callback: RoutesCallback) {
+        database.getAll(callback)
     }
 
     fun getGuid(): String {
