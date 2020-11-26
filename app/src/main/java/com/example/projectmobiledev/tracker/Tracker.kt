@@ -9,22 +9,22 @@ import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.location.LocationProvider
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.graphics.createBitmap
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
-import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
@@ -35,16 +35,12 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import kotlinx.android.synthetic.main.tracker.*
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Polyline
-import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.tracker.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
-import java.lang.Exception
 
 class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -75,7 +71,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         polyLineOptions.color(Color.MAGENTA)
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         if(Permissions.checkLocationPermission(this)){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
         }else{
             Permissions.askLocationPermission(this);
         }
@@ -108,7 +104,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             // First save all the images
             // saveImages() // this is used for storing images locally
             controller.stopTracking()
-            Log.d("Time",controller.getElapsedTime().toString())
+            Log.d("Time", controller.getElapsedTime().toString())
             controller.writeToDatabase()
             Log.d("DB", "Written to database")
         }
@@ -134,10 +130,10 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         // Hopelijk is dit collision proof
         val fileName = "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}.JPG"
         val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val file = File(storagedir,fileName)
+        val file = File(storagedir, fileName)
         try {
             val stream: OutputStream = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.JPEG,100,stream)
+            image.compress(Bitmap.CompressFormat.JPEG, 100, stream)
             stream.flush()
             stream.close()
         }catch (e: Exception){
@@ -146,7 +142,11 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<out String>,grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
             if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -154,7 +154,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 updateCurrentLocation()
                 if (Permissions.checkLocationPermission(this)){ // geen idee waarom ik dit hier moet zetten want ik zit letterlijk in een PermissionResult callback :confused:
                     val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,10.0f,this)
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        5000,
+                        10.0f,
+                        this
+                    )
                 }
             }
         }
@@ -171,7 +176,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             locationProvider.lastLocation.addOnSuccessListener(this)
             { location ->
                 if (location != null){
-                    val loc:LatLng = LatLng(location.latitude,location.longitude)
+                    val loc:LatLng = LatLng(location.latitude, location.longitude)
                     currentLocation = loc
                     startOnCurrentLocation()
                 }
@@ -181,15 +186,22 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
     private fun startOnCurrentLocation(){
         if (Permissions.checkLocationPermission(this)){
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,18f))
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18f))
         }
     }
 
     override fun onLocationChanged(location: Location) {
-        controller.addLocation(LatLng(location.latitude,location.longitude))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(location.latitude,location.longitude),18f))
+        controller.addLocation(LatLng(location.latitude, location.longitude))
+        map.moveCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    location.latitude,
+                    location.longitude
+                ), 18f
+            )
+        )
         drawMap()
-        currentLocation = LatLng(location.latitude,location.longitude)
+        currentLocation = LatLng(location.latitude, location.longitude)
         val distance = controller.getTotalDistance()
         println(distance)
     }
@@ -206,14 +218,14 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
     private fun drawMap(){
         val points = controller.getAllLocations()
-        line.points = points.map{location -> LatLng(location.latitude,location.longitude)  }
+        line.points = points.map{ location -> LatLng(location.latitude, location.longitude)  }
     }
 
     private val cameraOnClick = object : View.OnClickListener{
         override fun onClick(v: View?) {
             val openCamera : Intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (openCamera.resolveActivity(packageManager) != null){
-                startActivityForResult(openCamera,0)
+                startActivityForResult(openCamera, 0)
             }
         }
     }
@@ -227,9 +239,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     val image = data.extras?.get("data") as Bitmap
                     // only add the marker when the picture is actually taken
                     val marker = MarkerOptions()
-                    marker.position(LatLng(currentLocation.latitude,currentLocation.longitude))
+                    marker.position(LatLng(currentLocation.latitude, currentLocation.longitude))
                     map.addMarker(marker)
-                    controller.addMarker(currentLocation,image)
+                    controller.addMarker(currentLocation, image)
                 }
             }
             else -> throw IllegalStateException("Image error")
@@ -241,6 +253,42 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onProviderEnabled(provider: String){
+        super.onProviderEnabled(provider)
+    }
+
+    override fun onProviderDisabled(provider: String){
+        super.onProviderDisabled(provider)
+    }
+
+
+    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {
+        //super.onStatusChanged(provider, status, extras)
+        when (status) {
+            LocationProvider.OUT_OF_SERVICE -> {
+                Log.d("Status", "Status Changed: Out of Service")
+                Toast.makeText(
+                    this, "Location Status Changed: Out of Service",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            LocationProvider.TEMPORARILY_UNAVAILABLE -> {
+                Log.d("Status", "Status Changed: Temporarily Unavailable")
+                Toast.makeText(
+                    this, "Location Status Changed: Temporarily Unavailable",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            LocationProvider.AVAILABLE -> {
+                Log.d("Status", "Status Changed: Available")
+                Toast.makeText(
+                    this, "Location Status Changed: Available",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     override fun onMarkerClick(marker: Marker?): Boolean {
