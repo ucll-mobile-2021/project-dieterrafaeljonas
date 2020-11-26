@@ -60,15 +60,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val callback = object : RoutesCallback {
-            override fun callback(routes: List<TrackerModel>) {
-                for (route in routes){
-                    Log.d("Route", route.toString())
-                }
-            }
-        }
-
-        controller.getAll(callback)
         controller.startTracking()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
@@ -127,7 +118,8 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     private fun saveImages() : Boolean {
         if (Permissions.checkWriteExternalStoragePermission(this)) {
             for ((k, v) in controller.getAllMarkers()) {
-                saveImage(v, k);
+                if (v != null)
+                    saveImage(v, k);
             }
             Log.d("Save", "Images Saved")
             return true

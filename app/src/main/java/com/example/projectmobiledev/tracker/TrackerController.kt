@@ -34,11 +34,11 @@ class TrackerController() {
         route.removeMarker(location);
     }
 
-    fun getAllMarkers() : MutableMap<LatLng,Bitmap>{
+    fun getAllMarkers() : MutableMap<LatLng,Bitmap?>{
         return route.getAllMarkers()
     }
 
-    fun getTotalDistance() : Float{
+    fun getTotalDistance() : Double{
         return route.getTotalDistance();
     }
 
@@ -61,5 +61,7 @@ class TrackerController() {
     fun getGuid(): String {
         return route.guid.toString()
     }
+
+
 
 }

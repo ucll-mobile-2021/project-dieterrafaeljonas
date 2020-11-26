@@ -4,27 +4,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    android:background="@color/colorPrimaryDark"
+
+     >
 
     <ImageView
         android:id="@+id/imagePopup"
-        android:layout_width="400dp"
-        android:layout_height="600dp"
+        android:layout_width="406dp"
+        android:layout_height="555dp"
         android:contentDescription="image linked with marker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/nav_tracker" />
 
-    <ImageButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="32dp"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imagePopup"
-        app:srcCompat="@android:drawable/btn_dialog" />
+        app:srcCompat="@drawable/stop_tracking" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

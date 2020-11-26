@@ -5,15 +5,15 @@ import android.location.Location
 import com.example.projectmobiledev.Time
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.Exclude
+import org.json.JSONObject
 import java.util.*
 
 class TrackerModel() {
     var guid: UUID? = UUID.randomUUID()
     lateinit var userEmail: String
     private val route = mutableListOf<LatLng>()
-    private val markers = mutableMapOf<LatLng,Bitmap>()
-    private var totalDistance = 0.0f;
+    private val markers = mutableMapOf<LatLng,Bitmap?>()
+    private var totalDistance : Double = 0.0;
     lateinit var startDate : Date
     var  endDate : Date? = null
 
@@ -53,11 +53,11 @@ class TrackerModel() {
             markers.remove(location)
     }
 
-    fun getAllMarkers(): MutableMap<LatLng,Bitmap> {
+    fun getAllMarkers(): MutableMap<LatLng,Bitmap?> {
         return markers;
     }
 
-    fun getTotalDistance(): Float {
+    fun getTotalDistance(): Double {
         return totalDistance;
     }
 
@@ -74,7 +74,7 @@ class TrackerModel() {
     }
 
     fun calculateDistance() {
-        var totalDistance = 0.0f
+        var totalDistance = 0.0
         if (route.size > 1) {
             val floatArray = floatArrayOf(1.0f)
             for (i in 0 until route.size - 1) {
@@ -98,6 +98,24 @@ class TrackerModel() {
     fun setLocations(locations: MutableList<LatLng>) {
         route.clear()
         route.addAll(locations)
+    }
+
+    fun setMarkers(new_markers: MutableMap<LatLng, Bitmap?>) {
+        markers.clear()
+        markers.putAll(new_markers)
+    }
+
+    fun toJson() : String {
+        val json : JSONObject = JSONObject()
+        json.put("guid", guid)
+        json.put("userEmail", userEmail)
+        json.put("route", route.map { latLng -> "${latLng.latitude};${latLng.longitude}"  })
+        val locationslist = markers.map { entry -> entry.key }
+        json.put("markers", locationslist.map { location -> "${location.latitude};${location.longitude}" })
+        json.put("totalDistance", totalDistance)
+        json.put("startDate",startDate)
+        json.put("endDate",endDate)
+        return json.toString()
     }
 
 

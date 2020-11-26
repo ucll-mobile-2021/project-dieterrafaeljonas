@@ -6,7 +6,11 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.database.Database
+import com.example.projectmobiledev.database.RoutesCallback
+import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
+import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -17,6 +21,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.log_in.*
+import org.json.JSONObject
+import kotlin.math.log
 
 class LogIn : AppCompatActivity() {
     private lateinit var gso: GoogleSignInOptions
@@ -82,11 +88,32 @@ class LogIn : AppCompatActivity() {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("auth", "signInWithCredential:success")
                     val user = auth.currentUser
-                    startActivity(Intent(this, Tracker::class.java))
+                    startNextActivity(this)
+                    //startActivity(Intent(this, Tracker::class.java))
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("auth", "signInWithCredential:failure", task.exception)
                 }
             }
+    }
+
+    private fun startNextActivity(logIn: LogIn) {
+
+        // code to go to a routeViewer
+//        val callback = object : RoutesCallback {
+//            override fun callback(routes: List<TrackerModel>) {
+//                if (routes.isNotEmpty()){
+//                    val intent = Intent(logIn,RouteViewer::class.java)
+//                    val json = routes[0].toJson()
+//                    intent.putExtra("route", json)
+//                    startActivity(intent)
+//                }
+//            }
+//        }
+//        val database = Database()
+//        database.getAll(callback)
+
+
+        startActivity(Intent(logIn,Tracker::class.java))
     }
 }
