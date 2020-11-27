@@ -13,6 +13,16 @@ class User {
         throw UserNotFoundException("User not found!")
     }
 
+    fun getUserEmailForDatabase() : String{
+        var email = getUserEmail()
+        email = email.replace(".","")
+        email = email.replace("#","")
+        email = email.replace("$","")
+        email = email.replace("[","")
+        email = email.replace("]","")
+        return email
+    }
+
     fun getUserProfilePictureURI() : Uri {
         if (user != null) {
             return user.photoUrl!!

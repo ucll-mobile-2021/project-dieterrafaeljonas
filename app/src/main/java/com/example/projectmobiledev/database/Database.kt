@@ -3,6 +3,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import com.example.projectmobiledev.Time
+import com.example.projectmobiledev.profile.User
 import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.tasks.Task
@@ -12,21 +13,21 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.*
 import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.util.*
 
 class Database() {
     private val database = FirebaseDatabase.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    fun getAll(callback: RoutesCallback){
+    fun getAll(callback: RoutesCallback, user : String){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(data: DataSnapshot) {
                 if (data.exists()) {
                     val routes = mutableListOf<TrackerModel>()
                     for (child in data.children) {
-                        var route = TrackerModel()
+                        val route = TrackerModel()
                         val email: String =  child.child("userEmail").value.toString()
-                        // val locations : MutableList<LatLng> = child.child("locations") as MutableList<LatLng>
                         val locations = readLocations(child.child("locations"))
                         val markers_database = readLocations(child.child("markers"))
                         val markers = mutableMapOf<LatLng,Bitmap?>()
@@ -44,7 +45,6 @@ class Database() {
                         route.calculateDistance() // this should yield the same result as just setting the totaldistance
                         route.setLocations(locations)
                         route.setMarkers(markers)
-                        //readImagesAndMarkers(route);
                         routes.add(route)
                     }
                     callback.callback(routes)
@@ -55,7 +55,7 @@ class Database() {
                 println("Error occurred while reading users data")
             }
         }
-        database.getReference("/Routes").addValueEventListener(valueEventListener)
+        database.getReference("/Routes/${user}").addValueEventListener(valueEventListener)
     }
 
     private fun decodeString(refName: String): LatLng {
@@ -78,23 +78,21 @@ class Database() {
     }
 
     fun writeRoute(route: TrackerModel) {
-        val routes = database.getReference("/Routes")
-        // let firebase handle the basic types such
-        // normally this would work but the map with bitmaps is throwing errors even after the @Exclude
-        // routes.child(route.guid.toString()).setValue(route)
-        routes.child(route.guid.toString()).child("userEmail").setValue(route.userEmail)
-        routes.child(route.guid.toString()).child("locations").setValue(route.getLocations())
-        routes.child(route.guid.toString()).child("totalDistance").setValue(route.getTotalDistance())
-        routes.child(route.guid.toString()).child("startDate").setValue(route.startDate)
-        routes.child(route.guid.toString()).child("endDate").setValue(route.endDate)
-        routes.child(route.guid.toString()).child("guid").setValue(route.guid)
-        routes.child(route.guid.toString()).child("markers").setValue(route.getAllMarkers().map { marker -> marker.key })
+        val user = User()
+        val routeUser = database.getReference("/Routes").child(user.getUserEmailForDatabase())
+
+        routeUser.child(route.guid.toString()).child("userEmail").setValue(route.userEmail)
+        routeUser.child(route.guid.toString()).child("locations").setValue(route.getLocations())
+        routeUser.child(route.guid.toString()).child("totalDistance").setValue(route.getTotalDistance())
+        routeUser.child(route.guid.toString()).child("startDate").setValue(route.startDate)
+        routeUser.child(route.guid.toString()).child("endDate").setValue(route.endDate)
+        routeUser.child(route.guid.toString()).child("guid").setValue(route.guid)
+        routeUser.child(route.guid.toString()).child("markers").setValue(route.getAllMarkers().map { marker -> marker.key })
 
         // write markers with bitmaps
         val images  = storage.getReference("/Images")
         val currentRouteImages = images.child(route.guid.toString())
 
-        var teller = 0
         for ((k,v) in route.getAllMarkers()){
             if (v != null){
                 val value = "PromenApp_${route.guid}_${k.latitude}_${k.longitude}.JPG"
@@ -107,7 +105,6 @@ class Database() {
                     }.addOnSuccessListener {
                         Log.d("Storage", "Image uploaded succesfully")
                     }
-                teller++
             }
         }
     }

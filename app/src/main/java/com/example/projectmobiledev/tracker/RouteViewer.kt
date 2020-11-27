@@ -6,19 +6,27 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.ImageReadyCallback
+import com.example.projectmobiledev.login.LogIn
+import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.image_popup.*
+import kotlinx.android.synthetic.main.tracker.*
 
 class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private lateinit var map : GoogleMap
@@ -30,6 +38,7 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
     private val database = Database()
     private lateinit var popupDialog : Dialog
     private lateinit var route_guid : String
+    lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +52,36 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         polyLineOptions.width(9f)
         polyLineOptions.color(Color.MAGENTA)
         popupDialog = Dialog(this)
+
+
+        //Initialiseren van de toggle
+        toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
+        //Toggle instellen als de knop waar op te klikken valt
+        drawerLayout.addDrawerListener(toggle)
+        //Toggle klaar zetten voor gebruik
+        toggle.syncState()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        //Clicks op menu items afhandelen
+        nav_view.setNavigationItemSelectedListener {
+            when(it.itemId) {
+                R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
+                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
+                R.id.Profile -> startActivity(Intent(this, Profile::class.java))
+                R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
+                R.id.LogOut -> {
+                    Firebase.auth.signOut()
+                    startActivity(Intent(this, LogIn::class.java))
+                }
+            }
+            true
+        }
     }
 
-    private val goToHome = object : View.OnClickListener {
-        override fun onClick(v: View?) {
-            //val intent = Intent(this, Profile::class.java)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true
         }
-
+        return super.onOptionsItemSelected(item)
     }
 
     private fun routeInit() {

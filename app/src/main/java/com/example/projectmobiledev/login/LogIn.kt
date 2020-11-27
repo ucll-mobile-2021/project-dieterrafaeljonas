@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.RoutesCallback
+import com.example.projectmobiledev.profile.User
 import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
@@ -21,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.android.synthetic.main.log_in.*
+import kotlinx.android.synthetic.main.profile.*
 import org.json.JSONObject
 import kotlin.math.log
 
@@ -100,20 +102,21 @@ class LogIn : AppCompatActivity() {
     private fun startNextActivity(logIn: LogIn) {
 
         // code to go to a routeViewer
-//        val callback = object : RoutesCallback {
-//            override fun callback(routes: List<TrackerModel>) {
-//                if (routes.isNotEmpty()){
-//                    val intent = Intent(logIn,RouteViewer::class.java)
-//                    val json = routes[0].toJson()
-//                    intent.putExtra("route", json)
-//                    startActivity(intent)
-//                }
-//            }
-//        }
-//        val database = Database()
-//        database.getAll(callback)
+        val callback = object : RoutesCallback {
+            override fun callback(routes: List<TrackerModel>) {
+                if (routes.isNotEmpty()){
+                    val intent = Intent(logIn,RouteViewer::class.java)
+                    val json = routes[0].toJson()
+                    intent.putExtra("route", json)
+                    startActivity(intent)
+                }
+            }
+        }
+        val database = Database()
+        val user = User()
+        database.getAll(callback, user.getUserEmailForDatabase())
 
 
-        startActivity(Intent(logIn,Tracker::class.java))
+        //startActivity(Intent(logIn,Tracker::class.java))
     }
 }

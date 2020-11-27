@@ -104,7 +104,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             // First save all the images
             // saveImages() // this is used for storing images locally
             controller.stopTracking()
-            Log.d("Time", controller.getElapsedTime().toString())
             controller.writeToDatabase()
             Log.d("DB", "Written to database")
         }
