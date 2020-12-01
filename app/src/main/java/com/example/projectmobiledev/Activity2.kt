@@ -9,6 +9,7 @@ import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 
 import com.example.projectmobiledev.profile.Profile
+import com.example.projectmobiledev.home.Home as home
 import com.example.projectmobiledev.tracker.Tracker
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -33,6 +34,7 @@ class Activity2 : AppCompatActivity() {
         //Clicks op menu items afhandelen
         nav_view.setNavigationItemSelectedListener {
             when(it.itemId) {
+                R.id.Home -> startActivity(Intent(this, home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))

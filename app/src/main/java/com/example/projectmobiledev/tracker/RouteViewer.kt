@@ -16,6 +16,7 @@ import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.ImageReadyCallback
+import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
@@ -64,6 +65,7 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         //Clicks op menu items afhandelen
         nav_view.setNavigationItemSelectedListener {
             when(it.itemId) {
+                R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))

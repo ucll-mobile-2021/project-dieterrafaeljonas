@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <item android:id="@+id/Home" android:title="Home" android:icon="@drawable/nav_home"/>
     <item android:id="@+id/Tracker" android:title="Tracker" android:icon="@drawable/nav_tracker"/>
     <item android:id="@+id/Example" android:title="Example" android:icon="@drawable/nav_example"/>
     <item android:id="@+id/Profile" android:title="Profile" android:icon="@drawable/profile"/>

@@ -26,6 +26,7 @@
         <activity android:name=".tracker.Tracker" />
         <activity android:name=".tracker.RouteViewer" />
         <activity android:name=".profile.Profile" />
+        <activity android:name=".home.Home" />
         <activity android:name=".pathFinder.PathFinder"/>
     </application>
 

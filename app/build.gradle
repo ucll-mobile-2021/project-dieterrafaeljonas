@@ -63,5 +63,7 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
     //Gson voor het vertalen van de direction api responses
     implementation 'com.google.code.gson:gson:2.8.6'
+    //test
+    implementation 'com.google.android.gms:play-services-basement:17.4.0'
 }
 apply plugin: 'com.google.gms.google-services'

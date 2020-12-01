@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.RoutesCallback
+import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.profile.User
 import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
@@ -117,6 +118,6 @@ class LogIn : AppCompatActivity() {
         database.getAll(callback, user.getUserEmailForDatabase())
 
 
-        //startActivity(Intent(logIn,Tracker::class.java))
+        startActivity(Intent(logIn,Home::class.java))
     }
 }
