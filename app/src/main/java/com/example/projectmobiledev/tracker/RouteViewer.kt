@@ -94,11 +94,11 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         route.userEmail = json.get("userEmail").asString
         route_guid = json.get("guid").asString
         val locationString = json.getAsJsonPrimitive("route").asString
-        if (!locationString.isEmpty()){
+        if (locationString != "[]"){
             locations.addAll(readLocations(locationString))
         }
         val markerString = json.getAsJsonPrimitive("markers").asString
-        if (!markerString.isEmpty()) {
+        if (markerString != "[]") {
             val markers_list = readLocations(markerString)
             for (i in markers_list) {
                 markers.put(i, null)
