@@ -11,6 +11,11 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
+import android.widget.Adapter
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.Activity2
@@ -37,12 +42,12 @@ import okhttp3.Request
 
 class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
-    lateinit var mapFragment : SupportMapFragment
     lateinit var map: GoogleMap
     lateinit var toggle: ActionBarDrawerToggle
     private lateinit var pointFrom: LatLng
     private lateinit var pointTo: LatLng
     private var firstPointSelected: Boolean = false
+    private lateinit var pathMode: String
     private lateinit var locationProvider : FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +58,26 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
+
+        //setting the spinner content to choose cycling walking or driving
+        val pathfinderMethods = resources.getStringArray(R.array.pathfinder_methods)
+        val spinner = findViewById<Spinner>(R.id.spinner1)
+        if(spinner != null){
+            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, pathfinderMethods)
+            spinner.adapter = adapter
+        }
+
+        //determining what happens when clicking on the spinner contents
+        spinner.onItemSelectedListener = object :
+        AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                pathMode = pathfinderMethods[position]
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                pathMode = "driving"
+            }
+        }
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         if(Permissions.checkLocationPermission(this)){
@@ -87,7 +112,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
 
     fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving&key=AIzaSyAa5lqRLaC2jS8fR_IhGgvwVhxk3p2aPCs"
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=${pathMode}&key=AIzaSyAa5lqRLaC2jS8fR_IhGgvwVhxk3p2aPCs"
     }
 
     private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
@@ -104,11 +129,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                 val path =  ArrayList<LatLng>()
 
                 for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
-//                    val startLatLng = LatLng(respObj.routes[0].legs[0].steps[i].start_location.lat.toDouble()
-//                            ,respObj.routes[0].legs[0].steps[i].start_location.lng.toDouble())
-//                    path.add(startLatLng)
-//                    val endLatLng = LatLng(respObj.routes[0].legs[0].steps[i].end_location.lat.toDouble()
-//                            ,respObj.routes[0].legs[0].steps[i].end_location.lng.toDouble())
                     path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
                 }
                 result.add(path)

@@ -4,4 +4,9 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="title_activity_logged_in">Authenticated</string>
+    <string-array name="pathfinder_methods">
+        <item>driving</item>
+        <item>walking</item>
+        <item>bicycling</item>
+    </string-array>
 </resources>
