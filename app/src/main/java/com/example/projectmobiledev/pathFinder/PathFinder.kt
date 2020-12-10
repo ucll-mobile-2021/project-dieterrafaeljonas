@@ -47,6 +47,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
     private lateinit var pointFrom: LatLng
     private lateinit var pointTo: LatLng
     private var firstPointSelected: Boolean = false
+    private var firstPathMade: Boolean = false
     private lateinit var pathMode: String
     private lateinit var locationProvider : FusedLocationProviderClient
 
@@ -57,7 +58,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
 
         //setting the spinner content to choose cycling walking or driving
         val pathfinderMethods = resources.getStringArray(R.array.pathfinder_methods)
@@ -208,6 +208,10 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         map.addMarker(MarkerOptions().position(it))
         //bij het selecteren van het eerste punt dit punt opslaan
         if(!firstPointSelected){
+            //if this is the second time the path is calculated we want to deleted the old path
+            if(firstPathMade){
+               lineoption.remove()
+            }
             pointFrom = LatLng(it.latitude, it.longitude)
             firstPointSelected = true
         }
@@ -217,6 +221,11 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             var URL = getDirectionURL(pointFrom,pointTo)
             GetDirection(URL).execute()
             firstPointSelected = false
+            //So we now a path was made before
+            if(!firstPathMade)
+            {
+                firstPathMade = true
+            }
         }
     }
 
