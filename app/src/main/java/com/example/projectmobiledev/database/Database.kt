@@ -42,12 +42,14 @@ class Database() {
                         route.endDate = java.sql.Time(endDate.milliseconds)
                         route.startDate = java.sql.Time(startDate.milliseconds)
                         route.guid = guid
-                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
                         route.setLocations(locations)
                         route.setMarkers(markers)
+                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
                         routes.add(route)
                     }
                     callback.callback(routes)
+                } else {
+                    callback.callback(mutableListOf())
                 }
             }
 
