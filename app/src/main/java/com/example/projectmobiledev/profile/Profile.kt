@@ -2,6 +2,7 @@ package com.example.projectmobiledev.profile
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.ImageView
@@ -18,6 +19,12 @@ import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.Polyline
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
@@ -27,11 +34,14 @@ import kotlinx.android.synthetic.main.tracker.drawerLayout
 import kotlinx.android.synthetic.main.tracker.nav_view
 import kotlin.math.round
 
-class Profile : AppCompatActivity() {
+class Profile : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var toggle : ActionBarDrawerToggle
     private val controller : ProfileController = ProfileController()
     private val database = Database()
     private lateinit var route : Route
+    private lateinit var polyLineOptions : PolylineOptions
+    private lateinit var map : GoogleMap
+    private lateinit var line : Polyline
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +99,18 @@ class Profile : AppCompatActivity() {
             }
             true
         }
+
+        /*
+        #######################
+        ## Setup voor de map ##
+        #######################
+         */
+        polyLineOptions = PolylineOptions()
+        polyLineOptions.width(9f)
+        polyLineOptions.color(Color.MAGENTA)
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.longest_hike) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     @SuppressLint("SetTextI18n")
@@ -142,7 +164,7 @@ class Profile : AppCompatActivity() {
                     res = r
                 }
             }
-            return Route(res.getTotalDistance(), res.getElapsedTime())
+            return Route(res.getTotalDistance(), res.getElapsedTime(), res.getLocations())
         } else {
             return Route()
         }
@@ -153,5 +175,14 @@ class Profile : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        if (route.distance != -1.0) {
+            line = map.addPolyline(polyLineOptions)
+            line.points = route.locations
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(route.getRouteCenter(), 18.0f))
+        }
     }
 }
