@@ -62,6 +62,11 @@ class TrackerController() {
         return route.guid.toString()
     }
 
+    fun setName(text: String) {
+        if (text != ""){
+            route.name = text;
+        }
+    }
 
 
 }

@@ -97,7 +97,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             when(it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
-                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this,PathFinder::class.java))
                 R.id.LogOut -> {

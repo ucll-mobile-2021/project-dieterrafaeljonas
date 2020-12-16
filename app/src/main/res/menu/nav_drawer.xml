@@ -2,10 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/Home" android:title="Home" android:icon="@drawable/nav_home"/>
     <item android:id="@+id/Tracker" android:title="Tracker" android:icon="@drawable/nav_tracker"/>
-    <item android:id="@+id/Example" android:title="Example" android:icon="@drawable/nav_example"/>
     <item android:id="@+id/Profile" android:title="Profile" android:icon="@drawable/profile"/>
     <item android:id="@+id/PathFinder" android:title="PathFinder" android:icon="@drawable/pathfinder"/>
     <item android:id="@+id/LogOut" android:title="Log Out" android:icon="@drawable/log_out" />
     <!-- Meerdere items kunnen nog worden toegevoegd -->
-
 </menu>

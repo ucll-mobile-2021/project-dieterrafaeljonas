@@ -20,9 +20,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -99,7 +97,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             when(it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
-                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
                 R.id.LogOut -> {
@@ -115,9 +112,14 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 // First save all the images
                 // saveImages() // this is used for storing images locally
                 // Create the AlertDialog object and return it
-                val popup = AlertDialog.Builder(this);
-                popup.setMessage("Do you want to save this route ?")
+                val popup = AlertDialog.Builder(this)
+                val inflater = layoutInflater
+                val view = inflater.inflate(R.layout.save_route, null)
+                popup.setView(view)
+//                popup.setMessage("Do you want to save this route ?")
                     .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
+                        val textview = view.findViewById<EditText>(R.id.route_name)
+                        controller.setName(textview.text.toString())
                         controller.stopTracking()
                         controller.writeToDatabase()
                         Log.d("DB", "Written to database")

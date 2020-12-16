@@ -38,7 +38,9 @@ class Database() {
                         val startDate : Time = Time(child.child("startDate").child("time").value as Long)
                         val endDate : Time = Time(child.child("endDate").child("time").value as Long)
                         val guid : UUID = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
+                        val name : String = child.child("name").value as String
                         route.userEmail = email
+                        route.name = name
                         route.endDate = java.sql.Time(endDate.milliseconds)
                         route.startDate = java.sql.Time(startDate.milliseconds)
                         route.guid = guid
@@ -90,6 +92,7 @@ class Database() {
         routeUser.child(route.guid.toString()).child("endDate").setValue(route.endDate)
         routeUser.child(route.guid.toString()).child("guid").setValue(route.guid)
         routeUser.child(route.guid.toString()).child("markers").setValue(route.getAllMarkers().map { marker -> marker.key })
+        routeUser.child(route.guid.toString()).child("name").setValue(route.name)
 
         // write markers with bitmaps
         val images  = storage.getReference("/Images")
