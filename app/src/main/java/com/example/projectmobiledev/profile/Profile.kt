@@ -16,6 +16,7 @@ import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
+import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
@@ -91,6 +92,7 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
+                R.id.RoutesOverview -> startActivity(Intent(this, RoutesViewer::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))
@@ -126,7 +128,7 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
             val km = route.distance / 1000
             longestHikeKm.text = km.round(3).toString()
             longestHikeTime.text = route.elapsedTime.toString()
-            longestHikeAvgSpeed.text = computeSpeed(route).round(3).toString() + " km/s"
+            longestHikeAvgSpeed.text = route.computeSpeed().round(3).toString() + " km/s"
         } else {
             longestHikeKm.text = 0.0.toString()
             longestHikeTime.text = 0.toString()
@@ -138,13 +140,6 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
         var multiplier = 1.0
         repeat(decimals) {multiplier *= 10}
         return round(this * multiplier) / multiplier
-    }
-
-    private fun computeSpeed(r : Route) : Double {
-        val distance = r.distance
-        val time : Double = r.elapsedTime.milliseconds.toDouble()
-        val mms = distance / time
-        return mms * 3600
     }
 
     private fun getTotalKm(routes: List<TrackerModel>) : Double {
@@ -163,7 +158,7 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
                     res = r
                 }
             }
-            return Route(res.getTotalDistance(), res.getElapsedTime(), res.getLocations())
+            return Route(res.getTotalDistance(), res.getElapsedTime(), res.getLocations(), res.name, res.guid)
         } else {
             return Route()
         }

@@ -4,6 +4,7 @@
     <item android:id="@+id/Tracker" android:title="Tracker" android:icon="@drawable/nav_tracker"/>
     <item android:id="@+id/Profile" android:title="Profile" android:icon="@drawable/profile"/>
     <item android:id="@+id/PathFinder" android:title="PathFinder" android:icon="@drawable/pathfinder"/>
+    <item android:id="@+id/RoutesOverview" android:title="Overview Routes" android:icon="@drawable/routes_overview" />
     <item android:id="@+id/LogOut" android:title="Log Out" android:icon="@drawable/log_out" />
     <!-- Meerdere items kunnen nog worden toegevoegd -->
 </menu>

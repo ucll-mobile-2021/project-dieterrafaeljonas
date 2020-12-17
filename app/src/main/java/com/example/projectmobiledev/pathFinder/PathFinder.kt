@@ -24,6 +24,7 @@ import com.example.projectmobiledev.R
 import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.profile.Profile
+import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -99,6 +100,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this,PathFinder::class.java))
+                R.id.RoutesOverview -> startActivity(Intent(this, RoutesViewer::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))

@@ -28,6 +28,7 @@
         <activity android:name=".profile.Profile" />
         <activity android:name=".home.Home" />
         <activity android:name=".pathFinder.PathFinder"/>
+        <activity android:name=".routesViewer.RoutesViewer"></activity>
     </application>
 
 </manifest>
