@@ -39,6 +39,7 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         holder.km.text = k.round(3).toString() + " km"
         holder.tijd.text = routes[position].elapsedTime.toString()
         holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " km/s"
+        holder.name.text = routes[position].name
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             var intent = Intent(context, RouteViewer::class.java)
@@ -70,5 +71,6 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         var km : TextView = itemView.findViewById(R.id.km_text)
         var tijd : TextView = itemView.findViewById(R.id.tijd_txt)
         var snelheid : TextView = itemView.findViewById(R.id.snelheid_txt)
+        var name : TextView = itemView.findViewById(R.id.name)
     }
 }
