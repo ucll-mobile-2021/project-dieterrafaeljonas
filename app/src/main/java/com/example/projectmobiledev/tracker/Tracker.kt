@@ -66,7 +66,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         setContentView(R.layout.tracker)
 
         val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
-
+        controller.startTracking()
         popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
         val mapFragment = supportFragmentManager
@@ -111,14 +111,10 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
         btnStopTracking.setOnClickListener{
             if (tracking) {
-                // First save all the images
-                // saveImages() // this is used for storing images locally
-                // Create the AlertDialog object and return it
                 val popup = AlertDialog.Builder(this)
                 val inflater = layoutInflater
                 val view = inflater.inflate(R.layout.save_route, null)
                 popup.setView(view)
-//                popup.setMessage("Do you want to save this route ?")
                     .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
                         val textview = view.findViewById<EditText>(R.id.route_name)
                         controller.setName(textview.text.toString())
@@ -126,12 +122,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         controller.writeToDatabase()
                         Log.d("DB", "Written to database")
                         // redirect to home page
-                        startActivity(Intent(this, Home::class.java));
+                        startActivity(Intent(this, PathFinder::class.java));
                     })
                     .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
                         controller.stopTracking();
                         // redirect to home page
-                        startActivity(Intent(this, Home::class.java));
+                        startActivity(Intent(this, PathFinder::class.java));
                     })
                 popup.show()
             }else{
@@ -141,7 +137,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 startStopButton.setImageResource(R.drawable.stop_tracking)
                 controller.startTracking()
             }
-
         }
 
     }

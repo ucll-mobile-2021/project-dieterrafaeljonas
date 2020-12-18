@@ -106,7 +106,8 @@ class Database() {
                 val data = baos.toByteArray()
                 currentRouteImages.child(value).putBytes(data)
                     .addOnFailureListener{
-                        Log.d("Storage", "something has gone wrong")
+                        println("error has occured while writing to storage")
+                        it.printStackTrace();
                     }.addOnSuccessListener {
                         Log.d("Storage", "Image uploaded succesfully")
                     }
@@ -123,27 +124,5 @@ class Database() {
             onImageReady.callback(bitmap)
         }
     }
-
-    private fun readImagesAndMarkers(route: TrackerModel) {
-        val routeReference = storage.reference.child("/Images/${route.guid}")
-        routeReference.listAll().addOnSuccessListener { items ->
-            var markerCount = 0
-            val markers = mutableMapOf<LatLng,Bitmap>()
-            val tasks = mutableListOf<Task<ByteArray>>()
-            for (item in items.items){
-                val ONE_MEGABYTE : Long = 1024 * 1024
-                val task = item.getBytes(ONE_MEGABYTE)
-                task.addOnSuccessListener {bytes ->
-                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    val latLng = decodeString(item.toString())
-                    markers.put(latLng,bitmap)
-                }
-                tasks.add(task)
-            }
-            println("all markers have been read")
-        }
-    }
-
-
 
 }
