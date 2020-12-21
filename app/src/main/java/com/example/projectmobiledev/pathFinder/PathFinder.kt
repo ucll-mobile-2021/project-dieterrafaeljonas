@@ -3,6 +3,7 @@ package com.example.projectmobiledev.pathFinder
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationListener
@@ -18,6 +19,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
@@ -28,6 +30,7 @@ import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -42,7 +45,7 @@ import kotlinx.android.synthetic.main.tracker.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
+class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRequestPermissionsResultCallback {
 
     lateinit var map: GoogleMap
     lateinit var toggle: ActionBarDrawerToggle
@@ -84,10 +87,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if(Permissions.checkLocationPermission(this)){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f,this)
-        }else{
+        if(!Permissions.checkLocationPermission(this)){
             Permissions.askLocationPermission(this)
+        }
+        else{
+            locationProvider.lastLocation.addOnSuccessListener {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+            }
         }
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -211,22 +217,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     //handle de tab op de map
     private fun handleClickOnMap(it: LatLng) {
-//        map.addMarker(MarkerOptions().position(it))
-//        //bij het selecteren van het eerste punt dit punt opslaan
-//        if(!firstPointSelected){
-//            pointFrom = LatLng(it.latitude, it.longitude)
-//            firstPointSelected = true
-//        }
-//        //bij het selecteren van het tweede het pad tusen de 2 geven
-//        else{
-//            pointTo = LatLng(it.latitude, it.longitude)
-//            var URL = getDirectionURL(pointFromForMethod,pointTo)
-//            GetDirection(URL).execute()
-//            firstPointSelected = false
-//            if(!firstTwoPointsAlreadySelectedInPath) {
-//                firstTwoPointsAlreadySelectedInPath = true;
-//            }
-//        }
         if(!firstPointSelected){
             wayPoints.add(map.addMarker(MarkerOptions().position(it).title("StartPoint")))
             startPoint = LatLng(it.latitude, it.longitude)
@@ -251,8 +241,22 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
     }
 
-    override fun onLocationChanged(p0: Location) {
-        //doe tot nu toe nix
-
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)))
+        {
+            if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+               if(Permissions.checkLocationPermission(this))
+               {
+                   map.isMyLocationEnabled = true
+                   locationProvider.lastLocation.addOnSuccessListener {
+                       map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+                   }
+               }
+            }
+        }
     }
 }
+
