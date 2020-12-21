@@ -32,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.ktx.auth
@@ -45,12 +46,14 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     lateinit var map: GoogleMap
     lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var pointFrom: LatLng
-    private lateinit var pointTo: LatLng
+    private lateinit var startPoint: LatLng
+    private lateinit var endPoint: LatLng
+    private lateinit var pointFromForMethod : LatLng
     private var firstPointSelected: Boolean = false
-    private var firstPathMade: Boolean = false
+    private var firstTwoPointsAlreadySelectedInPath = false
     private lateinit var pathMode: String
     private lateinit var locationProvider : FusedLocationProviderClient
+    private lateinit var wayPoints : ArrayList<Marker>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +111,8 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             }
             true
         }
+        //initialise the waypoint marker array
+        wayPoints = ArrayList<Marker>()
     }
 
 
@@ -206,27 +211,43 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     //handle de tab op de map
     private fun handleClickOnMap(it: LatLng) {
-        map.addMarker(MarkerOptions().position(it))
-        //bij het selecteren van het eerste punt dit punt opslaan
+//        map.addMarker(MarkerOptions().position(it))
+//        //bij het selecteren van het eerste punt dit punt opslaan
+//        if(!firstPointSelected){
+//            pointFrom = LatLng(it.latitude, it.longitude)
+//            firstPointSelected = true
+//        }
+//        //bij het selecteren van het tweede het pad tusen de 2 geven
+//        else{
+//            pointTo = LatLng(it.latitude, it.longitude)
+//            var URL = getDirectionURL(pointFromForMethod,pointTo)
+//            GetDirection(URL).execute()
+//            firstPointSelected = false
+//            if(!firstTwoPointsAlreadySelectedInPath) {
+//                firstTwoPointsAlreadySelectedInPath = true;
+//            }
+//        }
         if(!firstPointSelected){
-            //if this is the second time the path is calculated we want to deleted the old path
-            if(firstPathMade){
-               lineoption.remove()
-            }
-            pointFrom = LatLng(it.latitude, it.longitude)
-            firstPointSelected = true
+            wayPoints.add(map.addMarker(MarkerOptions().position(it).title("StartPoint")))
+            startPoint = LatLng(it.latitude, it.longitude)
+            pointFromForMethod = startPoint
+            firstPointSelected = true;
         }
-        //bij het selecteren van het tweede het pad tusen de 2 geven
         else{
-            pointTo = LatLng(it.latitude, it.longitude)
-            var URL = getDirectionURL(pointFrom,pointTo)
-            GetDirection(URL).execute()
-            firstPointSelected = false
-            //So we now a path was made before
-            if(!firstPathMade)
-            {
-                firstPathMade = true
+            if(firstTwoPointsAlreadySelectedInPath){
+                var marker = wayPoints.last()
+                marker.remove()
+                pointFromForMethod = endPoint
+                endPoint = LatLng(it.latitude, it.longitude)
+            }else {
+                endPoint = LatLng(it.latitude, it.longitude)
+                firstTwoPointsAlreadySelectedInPath = true;
             }
+            wayPoints.add(map.addMarker(MarkerOptions().title("EndPoint").position(it)))
+            var URL = getDirectionURL(pointFromForMethod, endPoint)
+            //draw route between the 2 points
+            GetDirection(URL).execute()
+
         }
     }
 
