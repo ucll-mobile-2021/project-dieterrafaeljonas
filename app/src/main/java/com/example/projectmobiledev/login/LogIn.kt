@@ -103,21 +103,19 @@ class LogIn : AppCompatActivity() {
     private fun startNextActivity(logIn: LogIn) {
 
         // code to go to a routeViewer
-        val callback = object : RoutesCallback {
-            override fun callback(routes: List<TrackerModel>) {
-                if (routes.isNotEmpty()){
-                    val intent = Intent(logIn,RouteViewer::class.java)
-                    val json = routes[0].toJson()
-                    intent.putExtra("route", json)
-                    startActivity(intent)
-                }
-            }
-        }
-        val database = Database()
-        val user = User()
-        database.getAll(callback, user.getUserEmailForDatabase())
-
-
+//        val callback = object : RoutesCallback {
+//            override fun callback(routes: List<TrackerModel>) {
+//                if (routes.isNotEmpty()){
+//                    val intent = Intent(logIn,RouteViewer::class.java)
+//                    val json = routes[0].toJson()
+//                    intent.putExtra("route", json)
+//                    startActivity(intent)
+//                }
+//            }
+//        }
+//        val database = Database()
+//        val user = User()
+//        database.getAll(callback, user.getUserEmailForDatabase())
         startActivity(Intent(logIn,Home::class.java))
     }
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ProjectMobileDev</string>
+    <string name="app_name">PromenApp</string>
     <!-- Toeveogen van strings voor blinde mensen bij het initialiseren van toggle -->
     <string name="open">Open</string>
     <string name="close">Close</string>

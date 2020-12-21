@@ -16,11 +16,13 @@ class TrackerModel() {
     private var totalDistance : Double = 0.0;
     lateinit var startDate : Date
     var  endDate : Date? = null
+    lateinit var name: String
 
     fun start(){
         val user = FirebaseAuth.getInstance().currentUser;
         userEmail = user?.email!!
         startDate = Calendar.getInstance().time
+        name = startDate.toString();
     }
 
     fun end(){

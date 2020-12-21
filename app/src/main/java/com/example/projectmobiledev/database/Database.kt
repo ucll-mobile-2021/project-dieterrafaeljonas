@@ -38,16 +38,20 @@ class Database() {
                         val startDate : Time = Time(child.child("startDate").child("time").value as Long)
                         val endDate : Time = Time(child.child("endDate").child("time").value as Long)
                         val guid : UUID = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
+                        val name : String = child.child("name").value as String
                         route.userEmail = email
+                        route.name = name
                         route.endDate = java.sql.Time(endDate.milliseconds)
                         route.startDate = java.sql.Time(startDate.milliseconds)
                         route.guid = guid
-                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
                         route.setLocations(locations)
                         route.setMarkers(markers)
+                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
                         routes.add(route)
                     }
                     callback.callback(routes)
+                } else {
+                    callback.callback(mutableListOf())
                 }
             }
 
@@ -88,6 +92,7 @@ class Database() {
         routeUser.child(route.guid.toString()).child("endDate").setValue(route.endDate)
         routeUser.child(route.guid.toString()).child("guid").setValue(route.guid)
         routeUser.child(route.guid.toString()).child("markers").setValue(route.getAllMarkers().map { marker -> marker.key })
+        routeUser.child(route.guid.toString()).child("name").setValue(route.name)
 
         // write markers with bitmaps
         val images  = storage.getReference("/Images")
@@ -101,7 +106,8 @@ class Database() {
                 val data = baos.toByteArray()
                 currentRouteImages.child(value).putBytes(data)
                     .addOnFailureListener{
-                        Log.d("Storage", "something has gone wrong")
+                        println("error has occured while writing to storage")
+                        it.printStackTrace();
                     }.addOnSuccessListener {
                         Log.d("Storage", "Image uploaded succesfully")
                     }
@@ -118,27 +124,5 @@ class Database() {
             onImageReady.callback(bitmap)
         }
     }
-
-    private fun readImagesAndMarkers(route: TrackerModel) {
-        val routeReference = storage.reference.child("/Images/${route.guid}")
-        routeReference.listAll().addOnSuccessListener { items ->
-            var markerCount = 0
-            val markers = mutableMapOf<LatLng,Bitmap>()
-            val tasks = mutableListOf<Task<ByteArray>>()
-            for (item in items.items){
-                val ONE_MEGABYTE : Long = 1024 * 1024
-                val task = item.getBytes(ONE_MEGABYTE)
-                task.addOnSuccessListener {bytes ->
-                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    val latLng = decodeString(item.toString())
-                    markers.put(latLng,bitmap)
-                }
-                tasks.add(task)
-            }
-            println("all markers have been read")
-        }
-    }
-
-
 
 }

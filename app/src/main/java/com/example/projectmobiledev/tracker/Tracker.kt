@@ -1,9 +1,12 @@
 package com.example.projectmobiledev.tracker
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Location
@@ -12,13 +15,12 @@ import android.location.LocationManager
 import android.location.LocationProvider
 import android.os.Bundle
 import android.os.Environment
+import android.provider.ContactsContract
 import android.provider.MediaStore
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -29,6 +31,7 @@ import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
+import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -36,6 +39,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.tracker.*
@@ -53,13 +57,16 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     private lateinit var locationProvider : FusedLocationProviderClient
     // dialog for image popup
     private lateinit var popupDialog : Dialog
+    private var tracking : Boolean = false
 
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        controller.startTracking()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
+
+        val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
+        controller.startTracking()
         popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
         val mapFragment = supportFragmentManager
@@ -91,9 +98,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             when(it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
-                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
+                R.id.RoutesOverview -> startActivity(Intent(this, RoutesViewer::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))
@@ -103,11 +110,33 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
 
         btnStopTracking.setOnClickListener{
-            // First save all the images
-            // saveImages() // this is used for storing images locally
-            controller.stopTracking()
-            controller.writeToDatabase()
-            Log.d("DB", "Written to database")
+            if (tracking) {
+                val popup = AlertDialog.Builder(this)
+                val inflater = layoutInflater
+                val view = inflater.inflate(R.layout.save_route, null)
+                popup.setView(view)
+                    .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
+                        val textview = view.findViewById<EditText>(R.id.route_name)
+                        controller.setName(textview.text.toString())
+                        controller.stopTracking()
+                        controller.writeToDatabase()
+                        Log.d("DB", "Written to database")
+                        // redirect to home page
+                        startActivity(Intent(this, PathFinder::class.java));
+                    })
+                    .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
+                        controller.stopTracking();
+                        // redirect to home page
+                        startActivity(Intent(this, PathFinder::class.java));
+                    })
+                popup.show()
+            }else{
+                // add current point as starting point
+                controller.addLocation(currentLocation);
+                tracking = true;
+                startStopButton.setImageResource(R.drawable.stop_tracking)
+                controller.startTracking()
+            }
         }
 
     }
@@ -192,7 +221,16 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     }
 
     override fun onLocationChanged(location: Location) {
-        controller.addLocation(LatLng(location.latitude, location.longitude))
+        if(tracking){
+            controller.addLocation(LatLng(location.latitude, location.longitude))
+            drawMap()
+        }
+        else{
+            Toast.makeText(
+                this, "Location tracking not enabled, click on the play button to enable it",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         map.moveCamera(
             CameraUpdateFactory.newLatLngZoom(
                 LatLng(
@@ -201,7 +239,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 ), 18f
             )
         )
-        drawMap()
         currentLocation = LatLng(location.latitude, location.longitude)
         val distance = controller.getTotalDistance()
         println(distance)

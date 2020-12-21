@@ -20,6 +20,7 @@ import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
+import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -67,9 +68,9 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
             when(it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
-                R.id.Example -> startActivity(Intent(this, Activity2::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
                 R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
+                R.id.RoutesOverview -> startActivity(Intent(this, RoutesViewer::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
                     startActivity(Intent(this, LogIn::class.java))
