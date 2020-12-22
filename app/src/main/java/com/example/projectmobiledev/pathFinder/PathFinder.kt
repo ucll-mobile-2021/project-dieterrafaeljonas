@@ -3,21 +3,19 @@ package com.example.projectmobiledev.pathFinder
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Adapter
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.fragment.app.FragmentActivity
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
@@ -28,10 +26,12 @@ import com.example.projectmobiledev.routesViewer.RoutesViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.ktx.auth
@@ -40,16 +40,27 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.tracker.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 
-class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
+class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRequestPermissionsResultCallback {
 
     lateinit var map: GoogleMap
     lateinit var toggle: ActionBarDrawerToggle
-    private lateinit var pointFrom: LatLng
-    private lateinit var pointTo: LatLng
+    private lateinit var startPoint: LatLng
+    private lateinit var endPoint: LatLng
+    private lateinit var pointFromForMethod : LatLng
     private var firstPointSelected: Boolean = false
+    private var firstTwoPointsAlreadySelectedInPath = false
     private lateinit var pathMode: String
     private lateinit var locationProvider : FusedLocationProviderClient
+    private lateinit var wayPoints : ArrayList<Marker>
+    private lateinit var searchResults : ArrayList<Marker>
+    private lateinit var searchView : SearchView
+    private lateinit var addresList : List<Address>
+    private lateinit var geocoder: Geocoder
+    private lateinit var address: Address
+    private lateinit var positionFound : LatLng
+    private var alreadyLookedUpPosition : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +69,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
 
         //setting the spinner content to choose cycling walking or driving
         val pathfinderMethods = resources.getStringArray(R.array.pathfinder_methods)
@@ -81,10 +91,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
         }
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if(Permissions.checkLocationPermission(this)){
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f,this)
-        }else{
+        if(!Permissions.checkLocationPermission(this)){
             Permissions.askLocationPermission(this)
+        }
+        else{
+            locationProvider.lastLocation.addOnSuccessListener {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+            }
         }
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
@@ -108,6 +121,75 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
             }
             true
         }
+        //initialise the waypoint marker array
+        wayPoints = ArrayList<Marker>()
+
+        //looks up the stuff and gives you the location
+        searchResults = ArrayList<Marker>()
+        searchView = findViewById(R.id.sv_location)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(p0: String?): Boolean {
+                //show suggestions
+                if (p0 != null || p0 != ""){
+                    geocoder = Geocoder(this@PathFinder)
+                    try{
+                        addresList = geocoder.getFromLocationName(p0,3)
+                    } catch (e : IOException){
+                        e.printStackTrace()
+                    }
+                }
+                return false
+            }
+
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                if(p0 != null || p0 !="") {
+                    geocoder = Geocoder(this@PathFinder)
+                    try {
+                        addresList = geocoder.getFromLocationName(p0, 1)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    address = addresList.get(0)
+                    positionFound = LatLng(address.latitude, address.longitude)
+                    if (!alreadyLookedUpPosition) {
+                        if(!searchResults.isEmpty()){
+                            searchResults.forEach {
+                               it.remove()
+                            }
+                        }
+                        if (!firstPointSelected) {
+                            firstPointSelected = true
+                        }
+                        pointFromForMethod = positionFound
+                        if (!searchResults.isEmpty()) {
+                            var marker = searchResults.last()
+                            marker.remove()
+                        }
+                        searchResults.add(
+                            map.addMarker(
+                                MarkerOptions().position(positionFound).title(p0)
+                            )
+                        )
+                        alreadyLookedUpPosition = true
+                    }
+                    else{
+                        searchResults.add(
+                            map.addMarker(
+                                MarkerOptions().position(positionFound).title(p0)
+                            )
+                        )
+                        var URL = getDirectionURL(pointFromForMethod, positionFound)
+                        //draw route between the 2 points
+                        GetDirection(URL).execute()
+                        alreadyLookedUpPosition = false
+                        pointFromForMethod = positionFound
+                    }
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
+                }
+                return true
+            }
+        }
+        )
     }
 
 
@@ -206,23 +288,46 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback, LocationListener {
 
     //handle de tab op de map
     private fun handleClickOnMap(it: LatLng) {
-        map.addMarker(MarkerOptions().position(it))
-        //bij het selecteren van het eerste punt dit punt opslaan
         if(!firstPointSelected){
-            pointFrom = LatLng(it.latitude, it.longitude)
-            firstPointSelected = true
+            wayPoints.add(map.addMarker(MarkerOptions().position(it).title("StartPoint")))
+            startPoint = LatLng(it.latitude, it.longitude)
+            pointFromForMethod = startPoint
+            firstPointSelected = true;
         }
-        //bij het selecteren van het tweede het pad tusen de 2 geven
         else{
-            pointTo = LatLng(it.latitude, it.longitude)
-            var URL = getDirectionURL(pointFrom,pointTo)
+            if(firstTwoPointsAlreadySelectedInPath){
+                var marker = wayPoints.last()
+                marker.remove()
+                pointFromForMethod = endPoint
+                endPoint = LatLng(it.latitude, it.longitude)
+            }else {
+                endPoint = LatLng(it.latitude, it.longitude)
+                firstTwoPointsAlreadySelectedInPath = true;
+            }
+            wayPoints.add(map.addMarker(MarkerOptions().title("EndPoint").position(it)))
+            var URL = getDirectionURL(pointFromForMethod, endPoint)
+            //draw route between the 2 points
             GetDirection(URL).execute()
-            firstPointSelected = false
+
         }
     }
 
-    override fun onLocationChanged(p0: Location) {
-        //doe tot nu toe nix
-
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)))
+        {
+            if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            {
+               if(Permissions.checkLocationPermission(this))
+               {
+                   map.isMyLocationEnabled = true
+                   locationProvider.lastLocation.addOnSuccessListener {
+                       map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+                   }
+               }
+            }
+        }
     }
 }
+
