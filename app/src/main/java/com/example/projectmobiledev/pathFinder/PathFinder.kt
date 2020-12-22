@@ -1,8 +1,11 @@
 package com.example.projectmobiledev.pathFinder
 
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
+import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -10,6 +13,7 @@ import android.location.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -51,6 +55,7 @@ import kotlinx.android.synthetic.main.tracker.nav_view
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.collections.ArrayList
@@ -78,6 +83,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private val database: Database = Database()
     private lateinit var storeButton: FloatingActionButton
     private lateinit var cancelButton : FloatingActionButton
+    private lateinit var date : Date
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,9 +195,25 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         //set on click listener for store
         storeButton = findViewById(R.id.btnSavePath)
         storeButton.setOnClickListener {
-            storeRoute()
-            var routesViewer = Intent(this, RoutesViewer::class.java).apply {}
-            startActivity(routesViewer)
+            val inflater = layoutInflater
+            val popup = AlertDialog.Builder(this)
+            val view = inflater.inflate(R.layout.save_pathfinder, null)
+            val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener{
+                override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
+                    date = Date(p0.date)
+                }
+            })
+            popup.setView(view)
+                .setPositiveButton("Save", DialogInterface.OnClickListener { popup, _ ->
+                val editText = view.findViewById<EditText>(R.id.name_route)
+                storeRoute(editText.text.toString(), date)
+                var routesViewer = Intent(this, RoutesViewer::class.java).apply {}
+                startActivity(routesViewer)
+            }).setNegativeButton("Cancel", DialogInterface.OnClickListener{popup, _ ->
+                    popup.dismiss()
+                })
+            popup.show()
         }
 
         //set om click listener for cancel
@@ -344,11 +366,11 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         }
     }
 
-    private fun storeRoute(){
+    private fun storeRoute(route_name: String, date: Date){
         var trackerModelToStore = TrackerModel()
         trackerModelToStore.endDate = null
-        trackerModelToStore.name = "Route uit pathfinder"
-        trackerModelToStore.startDate = Calendar.getInstance().time
+        trackerModelToStore.name = route_name
+        trackerModelToStore.startDate = date
         val user = FirebaseAuth.getInstance().currentUser;
         trackerModelToStore.userEmail = user?.email!!
         trackerModelToStore.setLocations(routeToStore)
