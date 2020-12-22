@@ -1,6 +1,7 @@
 package com.example.projectmobiledev.pathFinder
 
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -19,11 +20,15 @@ import androidx.fragment.app.FragmentActivity
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.Time
+import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.profile.Profile
 import com.example.projectmobiledev.routesViewer.RoutesViewer
+import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.Tracker
+import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -34,13 +39,21 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.pathfinder.*
 import kotlinx.android.synthetic.main.tracker.*
+import kotlinx.android.synthetic.main.tracker.drawerLayout
+import kotlinx.android.synthetic.main.tracker.nav_view
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -60,7 +73,11 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private lateinit var geocoder: Geocoder
     private lateinit var address: Address
     private lateinit var positionFound : LatLng
-    private var alreadyLookedUpPosition : Boolean = false
+    private val routeToStore = mutableListOf<LatLng>()
+    private var indexRoute = 0
+    private val database: Database = Database()
+    private lateinit var storeButton: FloatingActionButton
+    private lateinit var cancelButton : FloatingActionButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +113,9 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         }
         else{
             locationProvider.lastLocation.addOnSuccessListener {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+                if(it != null) {
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+                }
             }
         }
         //Initialiseren van de toggle
@@ -143,23 +162,14 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 if(p0 != null || p0 !="") {
-                    geocoder = Geocoder(this@PathFinder)
-                    try {
-                        addresList = geocoder.getFromLocationName(p0, 1)
-                    } catch (e: IOException) {
-                        e.printStackTrace()
-                    }
-                    address = addresList.get(0)
-                    positionFound = LatLng(address.latitude, address.longitude)
-                    if (!alreadyLookedUpPosition) {
-                        if(!searchResults.isEmpty()){
-                            searchResults.forEach {
-                               it.remove()
-                            }
+                        geocoder = Geocoder(this@PathFinder)
+                        try {
+                            addresList = geocoder.getFromLocationName(p0, 1)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
-                        if (!firstPointSelected) {
-                            firstPointSelected = true
-                        }
+                        address = addresList.get(0)
+                        positionFound = LatLng(address.latitude, address.longitude)
                         pointFromForMethod = positionFound
                         if (!searchResults.isEmpty()) {
                             var marker = searchResults.last()
@@ -170,26 +180,26 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                                 MarkerOptions().position(positionFound).title(p0)
                             )
                         )
-                        alreadyLookedUpPosition = true
-                    }
-                    else{
-                        searchResults.add(
-                            map.addMarker(
-                                MarkerOptions().position(positionFound).title(p0)
-                            )
-                        )
-                        var URL = getDirectionURL(pointFromForMethod, positionFound)
-                        //draw route between the 2 points
-                        GetDirection(URL).execute()
-                        alreadyLookedUpPosition = false
-                        pointFromForMethod = positionFound
-                    }
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
                 }
                 return true
             }
         }
         )
+        //set on click listener for store
+        storeButton = findViewById(R.id.btnSavePath)
+        storeButton.setOnClickListener {
+            storeRoute()
+            var routesViewer = Intent(this, RoutesViewer::class.java).apply {}
+            startActivity(routesViewer)
+        }
+
+        //set om click listener for cancel
+        cancelButton = findViewById(R.id.btnDeletePath)
+        cancelButton.setOnClickListener {
+            var home = Intent(this, Home::class.java).apply {}
+            startActivity(home)
+        }
     }
 
 
@@ -215,6 +225,10 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                     path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
                 }
                 result.add(path)
+                path.forEach(){
+                    routeToStore.add(indexRoute,it)
+                    indexRoute++
+                }
             }catch (e:Exception){
                 e.printStackTrace()
             }
@@ -328,6 +342,17 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                }
             }
         }
+    }
+
+    private fun storeRoute(){
+        var trackerModelToStore = TrackerModel()
+        trackerModelToStore.endDate = null
+        trackerModelToStore.name = "Route uit pathfinder"
+        trackerModelToStore.startDate = Calendar.getInstance().time
+        val user = FirebaseAuth.getInstance().currentUser;
+        trackerModelToStore.userEmail = user?.email!!
+        trackerModelToStore.setLocations(routeToStore)
+        database.writeRoute(trackerModelToStore)
     }
 }
 
