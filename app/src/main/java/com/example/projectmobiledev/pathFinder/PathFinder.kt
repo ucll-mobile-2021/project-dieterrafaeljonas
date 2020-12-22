@@ -5,21 +5,17 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Adapter
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.FragmentActivity
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
@@ -44,6 +40,7 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.tracker.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 
 class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -57,6 +54,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private lateinit var pathMode: String
     private lateinit var locationProvider : FusedLocationProviderClient
     private lateinit var wayPoints : ArrayList<Marker>
+    private lateinit var searchResults : ArrayList<Marker>
+    private lateinit var searchView : SearchView
+    private lateinit var addresList : List<Address>
+    private lateinit var geocoder: Geocoder
+    private lateinit var address: Address
+    private lateinit var positionFound : LatLng
+    private var alreadyLookedUpPosition : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,6 +123,73 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         }
         //initialise the waypoint marker array
         wayPoints = ArrayList<Marker>()
+
+        //looks up the stuff and gives you the location
+        searchResults = ArrayList<Marker>()
+        searchView = findViewById(R.id.sv_location)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(p0: String?): Boolean {
+                //show suggestions
+                if (p0 != null || p0 != ""){
+                    geocoder = Geocoder(this@PathFinder)
+                    try{
+                        addresList = geocoder.getFromLocationName(p0,3)
+                    } catch (e : IOException){
+                        e.printStackTrace()
+                    }
+                }
+                return false
+            }
+
+            override fun onQueryTextSubmit(p0: String?): Boolean {
+                if(p0 != null || p0 !="") {
+                    geocoder = Geocoder(this@PathFinder)
+                    try {
+                        addresList = geocoder.getFromLocationName(p0, 1)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    address = addresList.get(0)
+                    positionFound = LatLng(address.latitude, address.longitude)
+                    if (!alreadyLookedUpPosition) {
+                        if(!searchResults.isEmpty()){
+                            searchResults.forEach {
+                               it.remove()
+                            }
+                        }
+                        if (!firstPointSelected) {
+                            firstPointSelected = true
+                        }
+                        pointFromForMethod = positionFound
+                        if (!searchResults.isEmpty()) {
+                            var marker = searchResults.last()
+                            marker.remove()
+                        }
+                        searchResults.add(
+                            map.addMarker(
+                                MarkerOptions().position(positionFound).title(p0)
+                            )
+                        )
+                        alreadyLookedUpPosition = true
+                    }
+                    else{
+                        searchResults.add(
+                            map.addMarker(
+                                MarkerOptions().position(positionFound).title(p0)
+                            )
+                        )
+                        var URL = getDirectionURL(pointFromForMethod, positionFound)
+                        //draw route between the 2 points
+                        GetDirection(URL).execute()
+                        alreadyLookedUpPosition = false
+                        pointFromForMethod = positionFound
+                    }
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
+                }
+                return true
+            }
+        }
+        )
     }
 
 

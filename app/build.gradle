@@ -31,18 +31,19 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     // dependencies voor google maps
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
-    implementation 'com.google.firebase:firebase-auth:19.3.1'
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.google.firebase:firebase-auth:20.0.1'
+    implementation 'com.google.android.gms:play-services-maps-license:12.0.1'
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     // Dependency voor nav drawer
-    implementation 'com.google.android.material:material:1.2.0-alpha04'
+    implementation 'com.google.android.material:material:1.3.0-beta01'
     // Import the BoM for the Firebase platform
     //implementation 'com.google.firebase:firebase-database:19.5.0'
     implementation platform('com.google.firebase:firebase-bom:26.0.0')
@@ -50,7 +51,7 @@ dependencies {
     // Declare the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.google.firebase:firebase-auth-ktx'
     // firestore dependenecies
 //    implementation platform('com.google.firebase:firebase-bom:26.1.0')
@@ -64,6 +65,6 @@ dependencies {
     //Gson voor het vertalen van de direction api responses
     implementation 'com.google.code.gson:gson:2.8.6'
     //test
-    implementation 'com.google.android.gms:play-services-basement:17.4.0'
+    implementation 'com.google.android.gms:play-services-basement:17.5.0'
 }
 apply plugin: 'com.google.gms.google-services'
