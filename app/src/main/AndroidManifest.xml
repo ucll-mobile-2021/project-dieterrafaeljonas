@@ -23,12 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".tracker.Tracker" />
+        <activity android:name=".tracker.Tracker"
+                  android:screenOrientation="portrait"/>
         <activity android:name=".tracker.RouteViewer" />
         <activity android:name=".profile.Profile" />
         <activity android:name=".home.Home" />
         <activity android:name=".pathFinder.PathFinder"/>
-        <activity android:name=".routesViewer.RoutesViewer"></activity>
+        <activity android:name=".routesViewer.RoutesViewer"/>
     </application>
 
 </manifest>

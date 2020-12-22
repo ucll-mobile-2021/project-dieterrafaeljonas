@@ -66,7 +66,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         setContentView(R.layout.tracker)
 
         val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
-        controller.startTracking()
         popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
         val mapFragment = supportFragmentManager
@@ -76,7 +75,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(9f)
-        polyLineOptions.color(Color.MAGENTA)
+        polyLineOptions.color(resources.getColor(R.color.colorAccent))
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         if(Permissions.checkLocationPermission(this)){
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
@@ -122,12 +121,15 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         controller.writeToDatabase()
                         Log.d("DB", "Written to database")
                         // redirect to home page
-                        startActivity(Intent(this, PathFinder::class.java));
+                        startActivity(Intent(this, RoutesViewer::class.java));
                     })
                     .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
                         controller.stopTracking();
                         // redirect to home page
-                        startActivity(Intent(this, PathFinder::class.java));
+                        startActivity(Intent(this, RoutesViewer::class.java));
+                    })
+                    .setNeutralButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
+                        popup.dismiss()
                     })
                 popup.show()
             }else{
@@ -172,11 +174,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
             if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
