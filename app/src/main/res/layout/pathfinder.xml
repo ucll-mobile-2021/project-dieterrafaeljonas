@@ -18,21 +18,25 @@
             android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintVertical_bias="1.0"
+            app:layout_constraintVertical_bias="0.0"
             map:layout_constraintEnd_toEndOf="parent"
             map:layout_constraintStart_toStartOf="parent"
             map:layout_constraintTop_toTopOf="parent"
-            tools:context=".tracker.Tracker" />
+            tools:context=".pathFinder.PathFinder" />
 
         <SearchView
+            android:id="@+id/sv_location"
             android:layout_width="260dp"
             android:layout_height="30dp"
-            android:id="@+id/sv_location"
-            android:queryHint="Search..."
-            android:iconifiedByDefault="false"
-            android:layout_margin="10dp"
+            android:layout_margin="0dp"
+            android:background="@drawable/bg_round"
             android:elevation="5dp"
-            android:background="@drawable/bg_round"/>
+            android:iconifiedByDefault="false"
+            android:queryHint="Search..."
+            app:layout_constraintEnd_toStartOf="@+id/spinner1"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
             android:id="@+id/spinner1"

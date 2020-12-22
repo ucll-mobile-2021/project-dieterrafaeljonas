@@ -110,6 +110,8 @@ class TrackerModel() {
     fun toJson() : String {
         val json : JSONObject = JSONObject()
         json.put("guid", guid)
+        json.put("guid_lsb", guid?.leastSignificantBits)
+        json.put("guid_msb", guid?.mostSignificantBits)
         json.put("userEmail", userEmail)
         json.put("route", route.map { latLng -> "${latLng.latitude};${latLng.longitude}"  })
         val locationslist = markers.map { entry -> entry.key }

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.home.Home
@@ -95,7 +96,7 @@ class RoutesViewer : AppCompatActivity() {
 
     fun setUp(routes: List<TrackerModel>) {
         for (route in routes) {
-            this.hikes.add(Route(route.getTotalDistance(), route.getElapsedTime(), route.getLocations(), route.name, route.guid))
+                this.hikes.add(Route(route.getTotalDistance(), Time(500000), route.getLocations(), route.name, route.guid))
         }
         val adapter = RecyclerViewAdapter(this, hikes, routes)
         recyclerView.adapter = adapter

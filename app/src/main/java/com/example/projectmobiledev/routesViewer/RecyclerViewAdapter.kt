@@ -13,6 +13,7 @@ import com.example.projectmobiledev.R
 import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.RouteViewer
+import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
 
 class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleViewHolder> {

@@ -61,8 +61,6 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         polyLineOptions.width(9f)
         polyLineOptions.color(resources.getColor(R.color.colorAccent))
         popupDialog = Dialog(this)
-
-
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         //Toggle instellen als de knop waar op te klikken valt
@@ -171,9 +169,6 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
                         val imageview = view.findViewById<ImageView>(R.id.imagePopup);
                         val image = markerEntry.value
                         val aspect = image?.width?.toDouble()!! / image?.height?.toDouble()!!;
-//                        val layout = imageview.layoutParams
-//                        layout.width = (image?.width!! * 0.66667).toInt()
-//                        layout.height = (image.height * (0.66667 * aspect)).toInt()
                         popupDialog.setContentView(R.layout.image_popup)
                         popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
                         popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener{ popupDialog.dismiss() }
@@ -199,24 +194,4 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         }
         return false;
     }
-
-//    override fun onMarkerClick(marker: Marker?): Boolean {
-//        if (marker != null) {
-//            val markers = controller.getAllMarkers()
-//            val markerlatLng: LatLng? = marker.position
-//            for (markerEntry in markers) {
-//                if (markerEntry.key == markerlatLng){
-//                    // found the right marker
-//                    // show image on popup
-//                    popupDialog.setContentView(R.layout.image_popup)
-//                    popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
-//                    popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener { popupDialog.dismiss() }
-//                    popupDialog.show()
-//                    return true
-//                }
-//            }
-//        }
-//        return false
-//    }
-
 }
