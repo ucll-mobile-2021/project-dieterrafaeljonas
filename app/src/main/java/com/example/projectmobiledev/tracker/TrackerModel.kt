@@ -3,12 +3,14 @@ package com.example.projectmobiledev.tracker
 import android.graphics.Bitmap
 import android.location.Location
 import com.example.projectmobiledev.Time
+import com.example.projectmobiledev.profile.User
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONObject
 import java.util.*
+import kotlin.Comparator
 
-class TrackerModel() {
+class TrackerModel()  {
     var guid: UUID? = UUID.randomUUID()
     lateinit var userEmail: String
     private val route = mutableListOf<LatLng>()
@@ -19,8 +21,8 @@ class TrackerModel() {
     lateinit var name: String
 
     fun start(){
-        val user = FirebaseAuth.getInstance().currentUser;
-        userEmail = user?.email!!
+        val user = User()
+        userEmail = user.getUserEmail()
         startDate = Calendar.getInstance().time
         name = startDate.toString();
     }
@@ -139,6 +141,5 @@ class TrackerModel() {
         val mms = d / time
         return mms * 3600
     }
-
 
 }
