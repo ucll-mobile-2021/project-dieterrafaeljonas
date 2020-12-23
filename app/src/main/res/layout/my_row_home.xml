@@ -34,11 +34,12 @@
                 android:id="@+id/start_Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="128dp"
                 android:text="Start date:"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/start_Time"
-                app:layout_constraintHorizontal_bias="0.125"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name" />
 
@@ -46,35 +47,11 @@
                 android:id="@+id/start_Time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="208dp"
                 android:text="Start time:"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/end_Date"
                 app:layout_constraintStart_toEndOf="@+id/start_Date"
-                app:layout_constraintTop_toBottomOf="@+id/name" />
-
-            <TextView
-                android:id="@+id/end_Date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="End date:"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/start_Time"
-                app:layout_constraintTop_toBottomOf="@+id/name"
-                app:layout_constraintVertical_bias="0.527" />
-
-            <TextView
-                android:id="@+id/end_Time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="End time:"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toEndOf="@+id/end_Date"
                 app:layout_constraintTop_toBottomOf="@+id/name" />
 
             <TextView
@@ -89,7 +66,8 @@
                 app:layout_constraintEnd_toEndOf="@+id/start_Date"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/start_Date"
-                app:layout_constraintTop_toBottomOf="@+id/start_Date" />
+                app:layout_constraintTop_toBottomOf="@+id/start_Date"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/start_Time_text"
@@ -101,39 +79,9 @@
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/start_Time"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/start_Time"
                 app:layout_constraintTop_toBottomOf="@+id/start_Time"
-                app:layout_constraintVertical_bias="0.0" />
-
-            <TextView
-                android:id="@+id/end_Date_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="TextView"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/end_Date"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/end_Date"
-                app:layout_constraintTop_toBottomOf="@+id/end_Date"
-                app:layout_constraintVertical_bias="0.944" />
-
-            <TextView
-                android:id="@+id/end_Time_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:text="TextView"
-                android:textColor="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/end_Time"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/end_Time"
-                app:layout_constraintTop_toBottomOf="@+id/end_Time"
                 app:layout_constraintVertical_bias="0.0" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

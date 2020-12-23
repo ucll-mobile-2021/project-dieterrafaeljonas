@@ -95,10 +95,12 @@ class RoutesViewer : AppCompatActivity() {
     }
 
     fun setUp(routes: List<TrackerModel>) {
-        for (route in routes) {
+        var new_routes = routes.sortedWith(compareBy { it.startDate })
+        new_routes = new_routes.filter { it.endDate != null }
+        for (route in new_routes) {
                 this.hikes.add(Route(route.getTotalDistance(), Time(500000), route.getLocations(), route.name, route.guid))
         }
-        val adapter = RecyclerViewAdapter(this, hikes, routes)
+        val adapter = RecyclerViewAdapter(this, hikes, new_routes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
     }

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.login.LogIn
@@ -28,6 +29,9 @@ import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import kotlinx.android.synthetic.main.tracker.*
+import java.time.Instant.now
+import java.time.LocalDate.now
+import java.util.*
 import kotlin.system.exitProcess
 
 
@@ -88,6 +92,8 @@ class Home : AppCompatActivity() {
 
     fun setUp(routes: List<TrackerModel>) {
         var new_routes = routes.sortedWith(compareBy { it.startDate })
+        var today = Calendar.getInstance().time.time
+        new_routes = new_routes.filter { it.endDate == null && it.startDate.time.minus(today) < 691200000}
         val adapter = RecyclerViewAdapterHome(this, new_routes, hikes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
