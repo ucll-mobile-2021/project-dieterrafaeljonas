@@ -13,6 +13,7 @@ import com.example.projectmobiledev.R
 import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.RouteViewer
+import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
 
 class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleViewHolder> {
@@ -36,9 +37,9 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecycleViewHolder, position: Int) {
         val k = routes[position].distance / 1000
-        holder.km.text = k.round(3).toString() + " km"
+        holder.km.text = k.round(3).toString() + " Km"
         holder.tijd.text = routes[position].elapsedTime.toString()
-        holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " km/s"
+        holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " Km/h"
         holder.name.text = routes[position].name
 
         holder.itemView.setOnClickListener(View.OnClickListener {

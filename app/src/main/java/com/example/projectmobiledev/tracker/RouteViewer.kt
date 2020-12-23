@@ -6,14 +6,17 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Display
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.ImageReadyCallback
 import com.example.projectmobiledev.home.Home
@@ -29,7 +32,11 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.image_popup.*
 import kotlinx.android.synthetic.main.tracker.*
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.*
 
+@Suppress("CAST_NEVER_SUCCEEDS")
 class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private lateinit var map : GoogleMap
     private lateinit var route: TrackerModel
@@ -52,10 +59,8 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         //btnClose.setOnClickListener(goToHome)
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(9f)
-        polyLineOptions.color(Color.MAGENTA)
+        polyLineOptions.color(resources.getColor(R.color.colorAccent))
         popupDialog = Dialog(this)
-
-
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         //Toggle instellen als de knop waar op te klikken valt
@@ -105,6 +110,18 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
                 markers.put(i, null)
             }
         }
+        route.name = json.get("name").asString
+        route.endDate = Date(json.get("endDate").asLong)
+        route.startDate = Date(json.get("startDate").asLong)
+        route.setLocations(locations)
+        route.calculateDistance()
+        // set time and distance
+        val time_text = findViewById<TextView>(R.id.txtTime)
+        val distance_text = findViewById<TextView>(R.id.txtDistance)
+        val distance = BigDecimal(route.getTotalDistance() / 1000.0)
+        val speed = BigDecimal(route.computeSpeed())
+        time_text.text = "Elapsed time: \n${route.getElapsedTime()}"
+        distance_text.text = "Distance: ${distance.setScale(2,RoundingMode.HALF_EVEN)} Km\nSpeed: ${speed.setScale(2,RoundingMode.HALF_EVEN)} Km/h"
     }
 
     private fun readLocations(locations : String) : List<LatLng> {
@@ -147,6 +164,11 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
                 if (markerEntry.key == marker.position){
                     if (markerEntry.value != null){
                         Log.d("Markers", "Cached image")
+                        val inflater = layoutInflater
+                        val view = inflater.inflate(R.layout.image_popup, null)
+                        val imageview = view.findViewById<ImageView>(R.id.imagePopup);
+                        val image = markerEntry.value
+                        val aspect = image?.width?.toDouble()!! / image?.height?.toDouble()!!;
                         popupDialog.setContentView(R.layout.image_popup)
                         popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
                         popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener{ popupDialog.dismiss() }
@@ -172,24 +194,4 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
         }
         return false;
     }
-
-//    override fun onMarkerClick(marker: Marker?): Boolean {
-//        if (marker != null) {
-//            val markers = controller.getAllMarkers()
-//            val markerlatLng: LatLng? = marker.position
-//            for (markerEntry in markers) {
-//                if (markerEntry.key == markerlatLng){
-//                    // found the right marker
-//                    // show image on popup
-//                    popupDialog.setContentView(R.layout.image_popup)
-//                    popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
-//                    popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener { popupDialog.dismiss() }
-//                    popupDialog.show()
-//                    return true
-//                }
-//            }
-//        }
-//        return false
-//    }
-
 }

@@ -27,6 +27,7 @@ import androidx.core.app.ActivityCompat
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
@@ -42,10 +43,14 @@ import com.google.android.gms.maps.model.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.tracker.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.*
 
 class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -58,6 +63,8 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     // dialog for image popup
     private lateinit var popupDialog : Dialog
     private var tracking : Boolean = false
+    private var viewing : Boolean = false
+    private val route = TrackerModel()
 
     lateinit var toggle: ActionBarDrawerToggle
 
@@ -66,18 +73,18 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         setContentView(R.layout.tracker)
 
         val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
-        controller.startTracking()
         popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(9f)
-        polyLineOptions.color(Color.MAGENTA)
+        polyLineOptions.color(resources.getColor(R.color.colorAccent))
+
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+
         if(Permissions.checkLocationPermission(this)){
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
         }else{
@@ -110,7 +117,24 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
 
         btnStopTracking.setOnClickListener{
-            if (tracking) {
+            if (viewing){
+                val popup = AlertDialog.Builder(this)
+                popup.setTitle("Are you sure you want to stop this promenade? You will no longer be able to take images on this route.")
+                popup
+                    .setPositiveButton("Yes", DialogInterface.OnClickListener{ popup, _ ->
+                        route.end()
+                        fixPoints()
+                        val database = Database()
+                        database.writeRoute(route)
+                        startActivity(Intent(this, Home::class.java));
+                    })
+                    .setNegativeButton("No",DialogInterface.OnClickListener{ popup, _ ->
+                        popup.dismiss()
+                    })
+                popup.show()
+            }
+            else{
+                if (tracking) {
                 val popup = AlertDialog.Builder(this)
                 val inflater = layoutInflater
                 val view = inflater.inflate(R.layout.save_route, null)
@@ -122,12 +146,15 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         controller.writeToDatabase()
                         Log.d("DB", "Written to database")
                         // redirect to home page
-                        startActivity(Intent(this, PathFinder::class.java));
+                        startActivity(Intent(this, RoutesViewer::class.java));
                     })
                     .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
                         controller.stopTracking();
                         // redirect to home page
-                        startActivity(Intent(this, PathFinder::class.java));
+                        startActivity(Intent(this, RoutesViewer::class.java));
+                    })
+                    .setNeutralButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
+                        popup.dismiss()
                     })
                 popup.show()
             }else{
@@ -137,46 +164,17 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                 startStopButton.setImageResource(R.drawable.stop_tracking)
                 controller.startTracking()
             }
-        }
-
-    }
-
-    private fun saveImages() : Boolean {
-        if (Permissions.checkWriteExternalStoragePermission(this)) {
-            for ((k, v) in controller.getAllMarkers()) {
-                if (v != null)
-                    saveImage(v, k);
             }
-            Log.d("Save", "Images Saved")
-            return true
+
         }
-        else{
-            Permissions.askWriteExternalStoragePermission(this)
-            return false
-        }
+
     }
 
-    private fun saveImage(image: Bitmap, location: LatLng) {
-        // Hopelijk is dit collision proof
-        val fileName = "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}.JPG"
-        val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val file = File(storagedir, fileName)
-        try {
-            val stream: OutputStream = FileOutputStream(file)
-            image.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            stream.flush()
-            stream.close()
-        }catch (e: Exception){
-            print("#######################################################")
-            print(e.message)
-        }
+    fun fixPoints(){
+        // TODO fix points that are not on the route but are in markers
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
             if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -191,11 +189,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         this
                     )
                 }
-            }
-        }
-        else if (permissions.contentEquals(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-            if (requestCode == Permissions.WRITE_EXTERNAL_STORAGE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                saveImages()
             }
         }
     }
@@ -223,7 +216,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     override fun onLocationChanged(location: Location) {
         if(tracking){
             controller.addLocation(LatLng(location.latitude, location.longitude))
-            drawMap()
+            drawMap(controller.getAllLocations())
         }
         else{
             Toast.makeText(
@@ -252,10 +245,10 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             map.isMyLocationEnabled = true
         }
         map.setOnMarkerClickListener(this)
+        routeInit()
     }
 
-    private fun drawMap(){
-        val points = controller.getAllLocations()
+    private fun drawMap(points : List<LatLng>){
         line.points = points.map{ location -> LatLng(location.latitude, location.longitude)  }
     }
 
@@ -279,7 +272,13 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     val marker = MarkerOptions()
                     marker.position(LatLng(currentLocation.latitude, currentLocation.longitude))
                     map.addMarker(marker)
-                    controller.addMarker(currentLocation, image)
+                    if (viewing){
+                        route.addMarker(currentLocation, image)
+                    }
+                    else{
+                        controller.addMarker(currentLocation, image)
+                    }
+
                 }
             }
             else -> throw IllegalStateException("Image error")
@@ -347,4 +346,49 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
         return false
     }
+
+    // check if we got a rout via json
+    private fun routeInit() {
+        val routeJson = intent.extras?.getString("route")
+        //val routeJson = intent.getStringExtra("route")
+        if (routeJson != null){
+            viewing = true
+            // disable button
+            val trackbutton = findViewById<FloatingActionButton>(R.id.btnStopTracking)
+            trackbutton.setImageResource(R.drawable.stop_tracking)
+            //trackbutton.isEnabled = false;
+            val json = JsonParser.parseString(routeJson).asJsonObject
+            route.userEmail = json.get("userEmail").asString
+            var route_guid = json.get("guid").asString
+            val locationString = json.getAsJsonPrimitive("route").asString
+            if (locationString != "[]"){
+                route.setLocations(readLocations(locationString))
+            }
+            val markerString = json.getAsJsonPrimitive("markers").asString
+            route.name = json.get("name").asString
+            route.startDate = Date(json.get("startDate").asLong)
+            route.calculateDistance()
+            val msb = json.get("guid_msb").asLong
+            val lsb = json.get("guid_lsb").asLong
+            val uuid = UUID(msb,lsb)
+            route.guid = uuid;
+        }
+        drawMap(route.getLocations())
+    }
+
+    private fun readLocations(locations : String) : MutableList<LatLng> {
+        val result = mutableListOf<LatLng>()
+        var locationString = locations
+        locationString = locationString.replace("[","")
+        locationString = locationString.replace("]","")
+        val locations_ = locationString.split(",")
+        for (location in locations_){
+            val latlng = location.split(";")
+            result.add(LatLng(latlng[0].toDouble(),latlng[1].toDouble()))
+        }
+        return result
+    }
+
+
+
 }

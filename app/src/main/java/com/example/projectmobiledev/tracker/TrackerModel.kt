@@ -110,14 +110,34 @@ class TrackerModel() {
     fun toJson() : String {
         val json : JSONObject = JSONObject()
         json.put("guid", guid)
+        json.put("guid_lsb", guid?.leastSignificantBits)
+        json.put("guid_msb", guid?.mostSignificantBits)
         json.put("userEmail", userEmail)
         json.put("route", route.map { latLng -> "${latLng.latitude};${latLng.longitude}"  })
         val locationslist = markers.map { entry -> entry.key }
         json.put("markers", locationslist.map { location -> "${location.latitude};${location.longitude}" })
         json.put("totalDistance", totalDistance)
-        json.put("startDate",startDate)
-        json.put("endDate",endDate)
+        json.put("startDate",startDate.time)
+        json.put("endDate",endDate?.time)
+        json.put("name",name)
         return json.toString()
+    }
+
+    fun getRouteCenter() : LatLng {
+        var avgLat = 0.0
+        var avgLong = 0.0
+        for (location in route) {
+            avgLat += location.latitude
+            avgLong += location.longitude
+        }
+        return LatLng(avgLat / route.size, avgLong / route.size)
+    }
+
+    fun computeSpeed() : Double {
+        val d = totalDistance
+        val time : Double = getElapsedTime().milliseconds.toDouble()
+        val mms = d / time
+        return mms * 3600
     }
 
 
