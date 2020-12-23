@@ -87,7 +87,8 @@ class Home : AppCompatActivity() {
     }
 
     fun setUp(routes: List<TrackerModel>) {
-        val adapter = RecyclerViewAdapterHome(this, routes, hikes)
+        var new_routes = routes.sortedWith(compareBy { it.startDate })
+        val adapter = RecyclerViewAdapterHome(this, new_routes, hikes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
     }
