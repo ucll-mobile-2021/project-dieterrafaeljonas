@@ -35,8 +35,22 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecycleViewHolder, position: Int) {
+        var hoursZero = "";
+        var minutesZero = "";
+        if(routes_db[position].startDate.hours < 10){
+            hoursZero = "0"
+        }
+        else{
+            hoursZero = "";
+        }
+        if(routes_db[position].startDate.minutes < 10){
+            minutesZero = "0"
+        }
+        else{
+            minutesZero = "";
+        }
         holder.name.text = "Route name: " + routes_db[position].name
-        holder.startTime.text = routes_db[position].startDate.hours.toString() + ":" + routes_db[position].startDate.minutes.toString()
+        holder.startTime.text = hoursZero + routes_db[position].startDate.hours.toString() + ":" + minutesZero + routes_db[position].startDate.minutes.toString()
         holder.startDate.text = routes_db[position].startDate.date.toString()  + "/" + (routes_db[position].startDate.month+1).toString() + "/" + (routes_db[position].startDate.year + 1900).toString()
         if(routes_db[position] != null){
     }
