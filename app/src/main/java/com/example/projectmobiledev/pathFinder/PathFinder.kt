@@ -2,9 +2,6 @@ package com.example.projectmobiledev.pathFinder
 
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
 import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,24 +10,19 @@ import android.location.*
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.FragmentActivity
-import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
-import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.home.Home
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.profile.Profile
 import com.example.projectmobiledev.routesViewer.RoutesViewer
-import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -55,8 +47,8 @@ import kotlinx.android.synthetic.main.tracker.nav_view
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
-import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -84,6 +76,9 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private lateinit var storeButton: FloatingActionButton
     private lateinit var cancelButton : FloatingActionButton
     private lateinit var date : Date
+    private var day : Int = 1
+    private var month : Int = 1
+    private var year : Int = 2020
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -198,19 +193,19 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             val inflater = layoutInflater
             val popup = AlertDialog.Builder(this)
             val view = inflater.inflate(R.layout.save_pathfinder, null)
+            val editText = view.findViewById<EditText>(R.id.name_route)
             val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
-            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener{
-                override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
-                    date = Date(p0.date)
-                }
-            })
+            val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
             popup.setView(view)
-                .setPositiveButton("Save", DialogInterface.OnClickListener { popup, _ ->
-                val editText = view.findViewById<EditText>(R.id.name_route)
-                storeRoute(editText.text.toString(), date)
-                var routesViewer = Intent(this, RoutesViewer::class.java).apply {}
-                startActivity(routesViewer)
-            }).setNegativeButton("Cancel", DialogInterface.OnClickListener{popup, _ ->
+                .setPositiveButton("Save", DialogInterface.OnClickListener{ popup, _ ->
+                    date = Date(calendarView.getDate())
+                    date.hours = timeView.hour
+                    date.minutes = timeView.minute
+                    storeRoute(editText.text.toString(), date)
+                    val intent = Intent(this, RoutesViewer::class.java).apply {}
+                    startActivity(intent)
+                })
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
                     popup.dismiss()
                 })
             popup.show()
