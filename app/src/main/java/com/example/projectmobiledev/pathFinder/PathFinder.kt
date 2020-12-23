@@ -202,8 +202,9 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                     date.hours = timeView.hour
                     date.minutes = timeView.minute
                     storeRoute(editText.text.toString(), date)
-                    val intent = Intent(this, Home::class.java).apply {}
-                    startActivity(intent)
+                    startActivity(Intent(this, Home::class.java));
+//                    val intent = Intent(this, Home::class.java).apply {}
+//                    startActivity(intent)
                 })
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
                     popup.dismiss()
@@ -362,7 +363,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     }
 
     private fun storeRoute(route_name: String, date: Date){
-        var trackerModelToStore = TrackerModel()
+        val trackerModelToStore = TrackerModel()
         trackerModelToStore.endDate = null
         trackerModelToStore.name = route_name
         trackerModelToStore.startDate = date

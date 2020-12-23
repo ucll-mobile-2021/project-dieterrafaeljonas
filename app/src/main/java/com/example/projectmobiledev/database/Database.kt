@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.*
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
+import java.time.Instant
 import java.util.*
 
 class Database() {
@@ -35,18 +36,26 @@ class Database() {
                             markers.put(i,null)
                         }
                         // val totalDistance : Double = child.child("totalDistance").value as Double
-                        val startDate : Date = Date(child.child("startDate").child("time").value as Long)
+                        var startDate : Date = Calendar.getInstance().time
+                        if (child.child("startDate").exists() && child.child("startDate").child("time").exists()){
+                            startDate = Date(child.child("startDate").child("time").value as Long)
+                        }
                         var endDate : Date? = null;
                         if (child.child("endDate").exists()){
                             endDate = Date(child.child("endDate").child("time").value as Long)
                         }
-                        //val endDate : Time = Time(child.child("endDate").child("time").value as Long)
-                        val guid : UUID = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
-                        val name : String = child.child("name").value as String
+                        var guid : UUID? = null
+                        if (child.child("guid").exists()){
+                            guid = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
+                        }
+                        var name = ""
+                        if (child.child("name").exists()){
+                            name  = child.child("name").value as String
+                        }
                         route.userEmail = email
                         route.name = name
                         route.endDate = endDate
-                        route.startDate = startDate
+                        route.startDate = startDate!!
                         route.guid = guid
                         route.setLocations(locations)
                         route.setMarkers(markers)
@@ -79,7 +88,7 @@ class Database() {
         val locations  = mutableListOf<LatLng>()
         for (i in 0 until locationsChild.childrenCount){
             val latlngChild = locationsChild.child(i.toString())
-            val latLng : LatLng = LatLng(latlngChild.child("latitude").value as Double, latlngChild.child("longitude").value as Double)
+            val latLng = LatLng(latlngChild.child("latitude").value as Double, latlngChild.child("longitude").value as Double)
             locations.add(latLng)
         }
         return locations
