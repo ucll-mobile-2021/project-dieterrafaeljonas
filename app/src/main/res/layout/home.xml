@@ -75,7 +75,18 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.702" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/RecyclerViewHome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/algemene_info"
+                app:layout_constraintHorizontal_bias="0.497"
+                app:layout_constraintStart_toStartOf="@+id/algemene_info"
+                app:layout_constraintTop_toTopOf="@+id/algemene_info"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
     </ScrollView>
 
     <!-- Navigation view toevoegen aan activity -->

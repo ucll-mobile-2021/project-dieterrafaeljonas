@@ -7,56 +7,54 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.Activity2
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.database.Database
+import com.example.projectmobiledev.database.RoutesCallback
 import com.example.projectmobiledev.login.LogIn
 import com.example.projectmobiledev.pathFinder.PathFinder
 import com.example.projectmobiledev.profile.Profile
+import com.example.projectmobiledev.profile.UserNotFoundException
+import com.example.projectmobiledev.routesViewer.RecyclerViewAdapter
 import com.example.projectmobiledev.routesViewer.RoutesViewer
+import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.Tracker
+import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.makeramen.roundedimageview.RoundedTransformationBuilder
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
 import kotlinx.android.synthetic.main.tracker.*
+import kotlin.system.exitProcess
 
 
 class Home : AppCompatActivity() {
     private lateinit var toggle: ActionBarDrawerToggle
     private val controller: HomeController = HomeController()
+    private var database = Database()
+    private var hikes = mutableListOf<Route>()
+    private lateinit var recyclerView : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home)
 
-        /*
-        ##########################
-        ## Setten van main info ##
-        ##########################
-         */
         val username : TextView = findViewById(R.id.username)
-        //val profilepic : ImageView = findViewById(R.id.profilepicture)
         username.text = controller.getUserEmail()
-        val transformation: Transformation = RoundedTransformationBuilder().cornerRadiusDp(200f).oval(true).build()
-        //Picasso.get().load(controller.getUserProfilePictureURI()).fit().transform(transformation).into(profilepic)
 
-        /*
-        ########################
-        ## Setten van totalen ##
-        ########################
-         */
-        //val tot_km : TextView = findViewById(R.id.amount_of_hikes)
-        //val tot_w : TextView = findViewById(R.id.total_kilometers)
-        // Not implemented yet
-        // tot_km.text = controller.getUserWalkedHikes().toString()
-        // tot_w.text = controller.getUserWalkedHikes().toString()
+        recyclerView = findViewById(R.id.RecyclerViewHome)
 
-        /*
-        ##############################
-        ## Setup voor de navigation ##
-        ##############################
-         */
+        val callback = object : RoutesCallback {
+            override fun callback(routes: List<TrackerModel>) {
+                setUp(routes);
+            }
+        }
+
+        database.getAll(callback, controller.getUserEmailForDatabase())
+
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         //Toggle instellen als de knop waar op te klikken valt
@@ -87,4 +85,14 @@ class Home : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    fun setUp(routes: List<TrackerModel>) {
+        for (route in routes) {
+            this.hikes.add(Route(route.getTotalDistance(), route.getElapsedTime(), route.getLocations(), route.name, route.guid))
+        }
+        val adapter = RecyclerViewAdapterHome(this, hikes, routes)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
 }
