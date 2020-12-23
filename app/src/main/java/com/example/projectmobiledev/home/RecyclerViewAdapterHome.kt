@@ -12,17 +12,18 @@ import com.example.projectmobiledev.R
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.TrackerModel
+import kotlin.time.hours
 
 class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.RecycleViewHolder> {
 
-    private var routes : MutableList<Route>
     private var context : Context
     private var routes_db : List<TrackerModel>
+    private var routes : MutableList<Route>
 
-    constructor(_context : Context, _routes: MutableList<Route>, _routes_db: List<TrackerModel>) {
+    constructor(_context : Context, _routes_db: List<TrackerModel>, _routes: MutableList<Route>) {
         context = _context
-        routes = _routes
         routes_db = _routes_db
+        routes = _routes
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecycleViewHolder {
@@ -33,10 +34,9 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: RecycleViewHolder, position: Int) {
-        holder.startDate.text = routes[position].startDate
-        holder.tijd.text = routes[position].elapsedTime.toString()
-        holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " km/s"
-        holder.name.text = routes[position].name
+        holder.startTime.text = routes_db[position].startDate.hours.toString() + ":" + routes_db[position].startDate.minutes.toString()
+        holder.startDate.text = routes_db[position].startDate.date.toString()  + "/" + (routes_db[position].startDate.month+1).toString() + "/" + (routes_db[position].startDate.year + 1900).toString()
+        holder.name.text = routes_db[position].name
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             var intent = Intent(context, RouteViewer::class.java)
@@ -55,19 +55,18 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
     }
 
     override fun getItemCount(): Int {
-        return routes.size
+        return routes_db.size
     }
 
-    private fun Double.round(decimals: Int) : Double {
+    /*private fun Double.round(decimals: Int) : Double {
         var multiplier = 1.0
         repeat(decimals) {multiplier *= 10}
         return kotlin.math.round(this * multiplier) / multiplier
-    }
+    }*/
 
     class RecycleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var startDate : TextView = itemView.findViewById(R.id.start_Date)
-        var tijd : TextView = itemView.findViewById(R.id.tijd_txt)
-        var snelheid : TextView = itemView.findViewById(R.id.snelheid_txt)
+        var startDate : TextView = itemView.findViewById(R.id.start_Date_text)
+        var startTime : TextView = itemView.findViewById(R.id.start_Time_text)
         var name : TextView = itemView.findViewById(R.id.name)
     }
 }

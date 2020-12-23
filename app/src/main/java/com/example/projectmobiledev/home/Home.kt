@@ -87,10 +87,7 @@ class Home : AppCompatActivity() {
     }
 
     fun setUp(routes: List<TrackerModel>) {
-        for (route in routes) {
-            this.hikes.add(Route(route.getTotalDistance(), route.getElapsedTime(), route.getLocations(), route.name, route.guid))
-        }
-        val adapter = RecyclerViewAdapterHome(this, hikes, routes)
+        val adapter = RecyclerViewAdapterHome(this, routes, hikes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
     }

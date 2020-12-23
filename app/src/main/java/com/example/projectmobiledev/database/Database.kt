@@ -35,7 +35,7 @@ class Database() {
                             markers.put(i,null)
                         }
                         // val totalDistance : Double = child.child("totalDistance").value as Double
-                        val startDate : Time = Time(child.child("startDate").child("time").value as Long)
+                        val startDate : Date = Date(child.child("startDate").child("time").value as Long)
                         var endDate : Date? = null;
                         if (child.child("endDate").exists()){
                             endDate = Date(child.child("endDate").child("time").value as Long)
@@ -46,7 +46,7 @@ class Database() {
                         route.userEmail = email
                         route.name = name
                         route.endDate = endDate
-                        route.startDate = java.sql.Time(startDate.milliseconds)
+                        route.startDate = startDate
                         route.guid = guid
                         route.setLocations(locations)
                         route.setMarkers(markers)

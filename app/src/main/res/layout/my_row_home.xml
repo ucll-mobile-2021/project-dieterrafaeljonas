@@ -22,15 +22,15 @@
                 android:id="@+id/start_Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Distance:"
+                android:text="Date:"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/tijd"
+                app:layout_constraintEnd_toStartOf="@+id/start_Time"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/name" />
 
             <TextView
-                android:id="@+id/tijd"
+                android:id="@+id/start_Time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Time:"
@@ -48,7 +48,7 @@
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tijd"
+                app:layout_constraintStart_toEndOf="@+id/start_Time"
                 app:layout_constraintTop_toBottomOf="@+id/name" />
 
             <TextView
@@ -65,7 +65,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/start_Date" />
 
             <TextView
-                android:id="@+id/tijd_txt"
+                android:id="@+id/start_Time_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -73,9 +73,9 @@
                 android:text="TextView"
                 android:textColor="#FFFFFF"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/tijd"
-                app:layout_constraintStart_toStartOf="@+id/tijd"
-                app:layout_constraintTop_toBottomOf="@+id/tijd" />
+                app:layout_constraintEnd_toEndOf="@+id/start_Time"
+                app:layout_constraintStart_toStartOf="@+id/start_Time"
+                app:layout_constraintTop_toBottomOf="@+id/start_Time" />
 
             <TextView
                 android:id="@+id/snelheid_txt"
