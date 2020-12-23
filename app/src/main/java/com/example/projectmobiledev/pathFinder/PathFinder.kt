@@ -202,7 +202,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                     date.hours = timeView.hour
                     date.minutes = timeView.minute
                     storeRoute(editText.text.toString(), date)
-                    val intent = Intent(this, RoutesViewer::class.java).apply {}
+                    val intent = Intent(this, Home::class.java).apply {}
                     startActivity(intent)
                 })
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
