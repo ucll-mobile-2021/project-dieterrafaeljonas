@@ -195,16 +195,19 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             val view = inflater.inflate(R.layout.save_pathfinder, null)
             val editText = view.findViewById<EditText>(R.id.name_route)
             val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+            date = Date(calendarView.getDate())
+            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener{
+                override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
+                    date = Date(p0.getDate())
+                }
+            })
             val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
             popup.setView(view)
                 .setPositiveButton("Save", DialogInterface.OnClickListener{ popup, _ ->
-                    date = Date(calendarView.getDate())
                     date.hours = timeView.hour
                     date.minutes = timeView.minute
                     storeRoute(editText.text.toString(), date)
                     startActivity(Intent(this, Home::class.java));
-//                    val intent = Intent(this, Home::class.java).apply {}
-//                    startActivity(intent)
                 })
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
                     popup.dismiss()
