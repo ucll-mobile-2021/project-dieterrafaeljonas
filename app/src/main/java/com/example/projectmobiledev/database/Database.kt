@@ -75,6 +75,22 @@ class Database() {
         database.getReference("/Routes/${user}").addValueEventListener(valueEventListener)
     }
 
+    fun removeRoute(guid : UUID){
+        val valueEventListener = object : ValueEventListener {
+            override fun onDataChange(data: DataSnapshot) {
+                if (data.exists()){
+                    data.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(data: DatabaseError) {
+                println("Error occurred while reading users data")
+            }
+        }
+        val user = User()
+        database.getReference("/Routes/${user.getUserEmailForDatabase()}/${guid.toString()}").addValueEventListener(valueEventListener)
+    }
+
     private fun decodeString(refName: String): LatLng {
         val mainstring = refName.split(".JPG")[0]
         val important = mainstring.split("_")
