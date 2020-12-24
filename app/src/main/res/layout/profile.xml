@@ -44,12 +44,13 @@
                 android:id="@+id/langste_wandeling"
                 android:layout_width="0dp"
                 android:layout_height="327dp"
+                android:layout_marginBottom="16dp"
                 android:background="#81c27a"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/algemene_info"
                 app:layout_constraintStart_toStartOf="@+id/algemene_info"
                 app:layout_constraintTop_toBottomOf="@+id/algemene_info"
-                app:layout_constraintVertical_bias="0.3" />
+                app:layout_constraintVertical_bias="0.31" />
 
             <com.makeramen.roundedimageview.RoundedImageView
                 android:id="@+id/profilepicture"

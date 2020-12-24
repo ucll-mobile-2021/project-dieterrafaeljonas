@@ -1,7 +1,9 @@
 package com.example.projectmobiledev.routesViewer
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +13,19 @@ import androidx.appcompat.view.menu.MenuView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.Time
+import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleViewHolder> {
 
     private var routes : MutableList<Route>
     private var context : Context
     private var routes_db : List<TrackerModel>
+    private var database = Database()
 
     constructor(_context : Context, _routes: MutableList<Route>, _routes_db: List<TrackerModel>) {
         context = _context
@@ -46,6 +51,21 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
             var intent = Intent(context, RouteViewer::class.java)
             intent.putExtra("route", getRightRoute(routes[position])!!.toJson())
             context.startActivity(intent)
+        })
+
+        holder.remove.setOnClickListener(View.OnClickListener {
+            var builder = AlertDialog.Builder(context)
+            builder.setCancelable(true)
+            builder.setTitle("Remove confirmation")
+            builder.setMessage("Are you sure you want to remove this route?")
+            builder.setPositiveButton("Yes", DialogInterface.OnClickListener{builder, _ ->
+                database.removeRoute(routes[position].guid!!)
+                context.startActivity(Intent(context, RoutesViewer::class.java))
+            })
+            builder.setNegativeButton("No", DialogInterface.OnClickListener{builder, _ ->
+                builder.dismiss()
+            })
+            builder.show()
         })
     }
 
@@ -73,5 +93,6 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         var tijd : TextView = itemView.findViewById(R.id.tijd_txt)
         var snelheid : TextView = itemView.findViewById(R.id.snelheid_txt)
         var name : TextView = itemView.findViewById(R.id.name)
+        var remove : FloatingActionButton = itemView.findViewById(R.id.remove_route)
     }
 }

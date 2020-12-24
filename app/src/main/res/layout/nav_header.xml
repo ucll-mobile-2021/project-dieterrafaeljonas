@@ -11,7 +11,7 @@
         android:id="@+id/textView"
         android:layout_width="172dp"
         android:layout_height="38dp"
-        android:text="Jonas De Boeck"
+        android:text="PromenApp"
         android:textAlignment="center"
         android:textColor="#FFFFFF"
         android:textSize="14sp"
@@ -27,7 +27,7 @@
         app:layout_constraintHorizontal_bias="0.07"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_launcher_foreground" />
+        android:src="@mipmap/logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
