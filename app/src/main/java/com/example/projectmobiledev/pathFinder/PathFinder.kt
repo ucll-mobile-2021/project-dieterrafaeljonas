@@ -3,11 +3,14 @@ package com.example.projectmobiledev.pathFinder
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
 import android.app.AlertDialog
 import android.app.SearchableInfo
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.*
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -79,6 +82,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private var lookedUpOnce : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(!isOnline(this)){
+            val inflater = layoutInflater
+            val popup = AlertDialog.Builder(this@PathFinder)
+            val view = inflater.inflate(R.layout.internet_alert, null)
+            popup.setView(view)
+            popup.show()
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pathfinder)
         // setup map fragment and get notified when the map is ready to use
@@ -89,15 +99,21 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         //setting the spinner content to choose cycling walking or driving
         val pathfinderMethods = resources.getStringArray(R.array.pathfinder_methods)
         val spinner = findViewById<Spinner>(R.id.spinner1)
-        if(spinner != null){
-            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, pathfinderMethods)
+        if (spinner != null) {
+            val adapter =
+                ArrayAdapter(this, android.R.layout.simple_spinner_item, pathfinderMethods)
             spinner.adapter = adapter
         }
 
         //determining what happens when clicking on the spinner contents
         spinner.onItemSelectedListener = object :
-        AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
                 pathMode = pathfinderMethods[position]
             }
 
@@ -106,14 +122,21 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             }
         }
         locationProvider = LocationServices.getFusedLocationProviderClient(this)
-        val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        if(!Permissions.checkLocationPermission(this)){
+        val locationManager: LocationManager =
+            getSystemService(LOCATION_SERVICE) as LocationManager
+        if (!Permissions.checkLocationPermission(this)) {
             Permissions.askLocationPermission(this)
-        }
-        else{
+        } else {
             locationProvider.lastLocation.addOnSuccessListener {
-                if(it != null) {
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(it.latitude, it.longitude), 18f))
+                if (it != null) {
+                    map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            LatLng(
+                                it.latitude,
+                                it.longitude
+                            ), 18f
+                        )
+                    )
                 }
             }
         }
@@ -126,11 +149,11 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         //Clicks op menu items afhandelen
         nav_view.setNavigationItemSelectedListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
-                R.id.PathFinder -> startActivity(Intent(this,PathFinder::class.java))
+                R.id.PathFinder -> startActivity(Intent(this, PathFinder::class.java))
                 R.id.RoutesOverview -> startActivity(Intent(this, RoutesViewer::class.java))
                 R.id.LogOut -> {
                     Firebase.auth.signOut()
@@ -159,7 +182,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-                        if(!addresList.isEmpty()) {
+                        if (!addresList.isEmpty()) {
                             address = addresList.get(0)
                             positionFound = LatLng(address.latitude, address.longitude)
                             pointFromForMethod = positionFound
@@ -172,34 +195,40 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                                     MarkerOptions().position(positionFound).title(p0)
                                 )
                             )
-                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
+                            map.animateCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    positionFound,
+                                    18f
+                                )
+                            )
                             firstPointSelected = true
                             lookedUpOnce = true
                             return true
-                        }
-                        else{
+                        } else {
                             val inflater = layoutInflater
                             val popup = AlertDialog.Builder(this@PathFinder)
                             val view = inflater.inflate(R.layout.look_up_alert2, null)
                             popup.setView(view)
-                                .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
-                                    popup.dismiss()
-                                })
+                                .setNegativeButton(
+                                    "Cancel",
+                                    DialogInterface.OnClickListener { popup, _ ->
+                                        popup.dismiss()
+                                    })
                             popup.show()
                         }
-                    }
-                    else{
+                    } else {
                         return false
                     }
-                }
-                else{
+                } else {
                     val inflater = layoutInflater
                     val popup = AlertDialog.Builder(this@PathFinder)
                     val view = inflater.inflate(R.layout.look_up_alert, null)
                     popup.setView(view)
-                        .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
-                            popup.dismiss()
-                        })
+                        .setNegativeButton(
+                            "Cancel",
+                            DialogInterface.OnClickListener { popup, _ ->
+                                popup.dismiss()
+                            })
                     popup.show()
                 }
                 return false
@@ -215,7 +244,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             val editText = view.findViewById<EditText>(R.id.name_route)
             val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
             val date = Date(calendarView.getDate())
-            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener{
+            calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener {
                 override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
                     date.date = p3
                     date.month = p2
@@ -224,13 +253,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             })
             val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
             popup.setView(view)
-                .setPositiveButton("Save", DialogInterface.OnClickListener{ popup, _ ->
+                .setPositiveButton("Save", DialogInterface.OnClickListener { popup, _ ->
                     date.hours = timeView.hour
                     date.minutes = timeView.minute
                     storeRoute(editText.text.toString(), date)
                     startActivity(Intent(this, Home::class.java));
                 })
-                .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener { popup, _ ->
                     popup.dismiss()
                 })
             popup.show()
@@ -395,6 +424,29 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         trackerModelToStore.userEmail = user?.email!!
         trackerModelToStore.setLocations(routeToStore)
         database.writeRoute(trackerModelToStore)
+    }
+
+    //check for internet connection
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
 

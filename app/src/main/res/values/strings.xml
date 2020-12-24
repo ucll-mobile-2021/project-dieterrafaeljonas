@@ -4,6 +4,8 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="title_activity_logged_in">Authenticated</string>
+    <string name="no_internet">No internet connection.</string>
+    <string name="no_internet_messsage">Sorry, you have no internet connection.</string>
     <string-array name="pathfinder_methods">
         <item>driving</item>
         <item>walking</item>
