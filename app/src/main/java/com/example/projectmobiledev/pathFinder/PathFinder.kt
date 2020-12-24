@@ -76,7 +76,6 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private val database: Database = Database()
     private lateinit var storeButton: FloatingActionButton
     private lateinit var cancelButton : FloatingActionButton
-    private lateinit var date : Date
     private var lookedUpOnce : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -215,10 +214,12 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             val view = inflater.inflate(R.layout.save_pathfinder, null)
             val editText = view.findViewById<EditText>(R.id.name_route)
             val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
-            date = Date(calendarView.getDate())
+            val date = Date(calendarView.getDate())
             calendarView.setOnDateChangeListener(object : CalendarView.OnDateChangeListener{
                 override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
-                    date = Date(p0.getDate())
+                    date.date = p3
+                    date.month = p2
+                    date.year = p1
                 }
             })
             val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
