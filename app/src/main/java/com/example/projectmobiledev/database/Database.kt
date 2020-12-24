@@ -6,6 +6,7 @@ import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.profile.User
 import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
@@ -13,6 +14,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.*
 import java.io.ByteArrayOutputStream
+import java.lang.Error
 import java.lang.Exception
 import java.time.Instant
 import java.util.*
@@ -82,14 +84,16 @@ class Database() : ValueEventListener {
 //        database.getReference("/Routes/${user}").addValueEventListener(valueEventListener)
 //    }
 
-    fun removeRoute(guid : UUID){
+    fun removeRoute(guid : UUID?){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(data: DataSnapshot) {
                 // remove roue
-                if (data.exists()){
-                    data.ref.removeValue()
+                if (guid != null){
+                    if (data.exists()){
+                        data.ref.removeValue()
+                    }
+                    removeImages(guid)
                 }
-                removeImages(guid)
             }
 
             override fun onCancelled(data: DatabaseError) {
@@ -100,12 +104,23 @@ class Database() : ValueEventListener {
     }
 
     private fun removeImages(guid: UUID) {
-        storage.getReference("/Images/${guid}").delete()
+        val ref = storage.getReference("/Images/${guid}")
+        val errorhandeler = object : OnFailureListener{
+            override fun onFailure(e: Exception) {
+               val errorcode = (e as StorageException).errorCode
+                if (errorcode == StorageException.ERROR_OBJECT_NOT_FOUND){
+                    Log.e("images","Images not found")
+                }
+                else{
+                    Log.e("images", "Random error $errorcode messaage:\n${e.message}")
+                }
+            }
+
+        }
+        ref.delete()
+            .addOnFailureListener(errorhandeler)
             .addOnSuccessListener {
                 Log.d("Storage delete","Removed images succesfully")
-            }
-            .addOnFailureListener{
-                Log.d("storage delete", "Images deletion failed")
             }
     }
 
