@@ -93,8 +93,7 @@ class Home : AppCompatActivity() {
 
     fun setUp(routes: List<TrackerModel>) {
         var new_routes = routes.sortedWith(compareBy { it.startDate })
-        var today = Calendar.getInstance().time.time
-        new_routes = new_routes.filter { it.endDate == null && it.startDate.time.minus(today) < 691200000}
+        new_routes = new_routes.filter { it.endDate == null}
         val adapter = RecyclerViewAdapterHome(this, new_routes, hikes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)

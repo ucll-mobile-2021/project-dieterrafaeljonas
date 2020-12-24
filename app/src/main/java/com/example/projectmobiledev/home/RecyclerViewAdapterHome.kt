@@ -1,18 +1,23 @@
 package com.example.projectmobiledev.home
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.R
+import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.tracker.Route
 import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.time.hours
 
 class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.RecycleViewHolder> {
@@ -20,6 +25,7 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
     private var context : Context
     private var routes_db : List<TrackerModel>
     private var routes : MutableList<Route>
+    private var database = Database()
 
     constructor(_context : Context, _routes_db: List<TrackerModel>, _routes: MutableList<Route>) {
         context = _context
@@ -59,6 +65,20 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
             intent.putExtra("route", getRightRoute(routes_db[position])!!.toJson())
             context.startActivity(intent)
         })
+
+        holder.removeRoute.setOnClickListener(View.OnClickListener {
+            var builder = AlertDialog. Builder(context)
+            builder.setCancelable(true)
+            builder.setTitle("Remove confirmation")
+            builder.setMessage("Are you sure you want to remove this route?")
+            builder.setPositiveButton("Yes", DialogInterface.OnClickListener{builder, _ ->
+                database.removeRoute(routes_db[position].guid!!)
+            })
+            builder.setNegativeButton("No", DialogInterface.OnClickListener{builder, _ ->
+                builder.dismiss()
+            })
+            builder.show()
+        })
     }
 
     private fun getRightRoute(route: TrackerModel) : TrackerModel? {
@@ -78,5 +98,6 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
         var name : TextView = itemView.findViewById(R.id.name)
         var startDate : TextView = itemView.findViewById(R.id.start_Date_text)
         var startTime : TextView = itemView.findViewById(R.id.start_Time_text)
+        var removeRoute : FloatingActionButton = itemView.findViewById(R.id.remove_Route)
     }
 }
