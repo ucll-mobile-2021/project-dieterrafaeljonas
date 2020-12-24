@@ -129,7 +129,7 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
             val km = route.distance / 1000
             longestHikeKm.text = km.round(3).toString()
             longestHikeTime.text = route.elapsedTime.toString()
-            longestHikeAvgSpeed.text = route.computeSpeed().round(3).toString() + " km/s"
+            longestHikeAvgSpeed.text = route.computeSpeed().round(3).toString() + " km/h"
         } else {
             longestHikeKm.text = 0.0.toString()
             longestHikeTime.text = 0.toString()
@@ -155,7 +155,7 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
         if (routes.isNotEmpty()) {
             var res = routes[0]
             for (r in routes) {
-                if (r.getTotalDistance() > res.getTotalDistance()) {
+                if (r.getTotalDistance() > res.getTotalDistance() && r.endDate != null) {
                     res = r
                 }
             }
