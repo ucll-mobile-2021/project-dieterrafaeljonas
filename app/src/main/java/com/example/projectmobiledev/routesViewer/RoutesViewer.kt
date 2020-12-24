@@ -99,7 +99,7 @@ class RoutesViewer : AppCompatActivity() {
         var new_routes = routes.sortedWith(compareBy { it.startDate })
         new_routes = new_routes.filter { it.endDate != null }
         for (route in new_routes) {
-                this.hikes.add(Route(route.getTotalDistance(), Time(500000), route.getLocations(), route.name, route.guid))
+                this.hikes.add(Route(route.getTotalDistance(), route.getElapsedTime(), route.getLocations(), route.name, route.guid))
         }
         val adapter = RecyclerViewAdapter(this, hikes, new_routes)
         recyclerView.adapter = adapter
