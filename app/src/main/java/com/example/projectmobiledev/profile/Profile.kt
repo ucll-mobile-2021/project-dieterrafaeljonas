@@ -123,13 +123,13 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
         val longestHikeTime : TextView = findViewById(R.id.longest_hike_time)
         val longestHikeAvgSpeed : TextView = findViewById(R.id.longest_hike_avg_speed)
         route = getLongestRoute(routes)
-        totW.text = routes.size.toString()
+        totW.text = getTotalHikes(routes).toString()
         totKm.text = getTotalKm(routes).round(3).toString()
         if (route.distance != -1.0) {
             val km = route.distance / 1000
             longestHikeKm.text = km.round(3).toString()
             longestHikeTime.text = route.elapsedTime.toString()
-            longestHikeAvgSpeed.text = route.computeSpeed().round(3).toString() + " km/s"
+            longestHikeAvgSpeed.text = route.computeSpeed().round(3).toString() + " km/h"
         } else {
             longestHikeKm.text = 0.0.toString()
             longestHikeTime.text = 0.toString()
@@ -143,10 +143,22 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
         return round(this * multiplier) / multiplier
     }
 
+    private fun getTotalHikes(routes: List<TrackerModel>) : Int {
+        var teller = 0
+        for (r in routes) {
+            if (r.endDate != null) {
+                teller++
+            }
+        }
+        return teller
+    }
+
     private fun getTotalKm(routes: List<TrackerModel>) : Double {
         var distance = 0.0;
         for (r in routes) {
-            distance += r.getTotalDistance()
+            if (r.endDate != null) {
+                distance += r.getTotalDistance()
+            }
         }
         return distance / 1000
     }
@@ -155,11 +167,21 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
         if (routes.isNotEmpty()) {
             var res = routes[0]
             for (r in routes) {
-                if (r.getTotalDistance() > res.getTotalDistance()) {
+                if (r.getTotalDistance() > res.getTotalDistance() && r.endDate != null) {
                     res = r
                 }
             }
-            return Route(res.getTotalDistance(), res.getElapsedTime(), res.getLocations(), res.name, res.guid)
+            if (res.endDate == null) {
+                return Route()
+            } else {
+                return Route(
+                    res.getTotalDistance(),
+                    res.getElapsedTime(),
+                    res.getLocations(),
+                    res.name,
+                    res.guid
+                )
+            }
         } else {
             return Route()
         }

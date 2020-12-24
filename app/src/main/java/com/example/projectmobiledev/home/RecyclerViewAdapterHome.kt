@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
@@ -18,6 +19,7 @@ import com.example.projectmobiledev.tracker.RouteViewer
 import com.example.projectmobiledev.tracker.Tracker
 import com.example.projectmobiledev.tracker.TrackerModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.*
 import kotlin.time.hours
 
 class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.RecycleViewHolder> {
@@ -79,6 +81,16 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
             })
             builder.show()
         })
+
+        holder.addEvent.setOnClickListener(View.OnClickListener {
+            val intent = Intent(Intent.ACTION_EDIT)
+            intent.type = "vnd.android.cursor.item/event"
+            intent.putExtra("beginTime", routes_db[position].startDate.time)
+            intent.putExtra("endTime", routes_db[position].startDate.time + 15 * 60 * 1000)
+            intent.putExtra("title", "PromenApp Route: " + routes_db[position].name)
+            intent.putExtra("description", "It's time for your PromenApp route!")
+            context.startActivity(intent)
+        })
     }
 
     private fun getRightRoute(route: TrackerModel) : TrackerModel? {
@@ -99,5 +111,6 @@ class RecyclerViewAdapterHome : RecyclerView.Adapter<RecyclerViewAdapterHome.Rec
         var startDate : TextView = itemView.findViewById(R.id.start_Date_text)
         var startTime : TextView = itemView.findViewById(R.id.start_Time_text)
         var removeRoute : FloatingActionButton = itemView.findViewById(R.id.remove_Route)
+        var addEvent : Button = itemView.findViewById(R.id.add_Event)
     }
 }
