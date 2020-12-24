@@ -219,7 +219,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
                 override fun onSelectedDayChange(p0: CalendarView, p1: Int, p2: Int, p3: Int) {
                     date.date = p3
                     date.month = p2
-                    date.year = p1
+                    date.year = p1 - 1900
                 }
             })
             val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
