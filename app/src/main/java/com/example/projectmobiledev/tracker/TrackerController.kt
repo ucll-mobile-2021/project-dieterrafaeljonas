@@ -55,7 +55,8 @@ class TrackerController() {
     }
 
     fun getAll(callback: RoutesCallback, user: String) {
-        database.getAll(callback, user)
+        //database.getAll(callback, user)
+        database.callback = callback
     }
 
     fun getGuid(): String {

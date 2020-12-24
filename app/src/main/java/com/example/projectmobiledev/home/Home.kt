@@ -57,7 +57,8 @@ class Home : AppCompatActivity() {
             }
         }
 
-        database.getAll(callback, controller.getUserEmailForDatabase())
+        database.callback = callback;
+        //database.getAll(callback, controller.getUserEmailForDatabase())
 
         //Initialiseren van de toggle
         toggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)

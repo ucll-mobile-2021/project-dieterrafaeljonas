@@ -13,7 +13,6 @@ import com.google.firebase.ktx.Firebase
 
 class User {
     private val user = FirebaseAuth.getInstance().currentUser
-    private val database = Database()
 
     fun getUserEmail() : String {
         if (user != null) {

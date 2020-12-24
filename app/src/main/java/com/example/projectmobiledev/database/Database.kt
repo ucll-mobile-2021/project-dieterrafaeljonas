@@ -17,78 +17,96 @@ import java.lang.Exception
 import java.time.Instant
 import java.util.*
 
-class Database() {
+class Database() : ValueEventListener {
     private val database = FirebaseDatabase.getInstance()
     private val storage = FirebaseStorage.getInstance()
-
-    fun getAll(callback: RoutesCallback, user : String){
-        val valueEventListener = object : ValueEventListener {
-            override fun onDataChange(data: DataSnapshot) {
-                if (data.exists()) {
-                    val routes = mutableListOf<TrackerModel>()
-                    for (child in data.children) {
-                        val route = TrackerModel()
-                        val email: String =  child.child("userEmail").value.toString()
-                        val locations = readLocations(child.child("locations"))
-                        val markers_database = readLocations(child.child("markers"))
-                        val markers = mutableMapOf<LatLng,Bitmap?>()
-                        for (i in markers_database){
-                            markers.put(i,null)
-                        }
-                        // val totalDistance : Double = child.child("totalDistance").value as Double
-                        var startDate : Date = Calendar.getInstance().time
-                        if (child.child("startDate").exists() && child.child("startDate").child("time").exists()){
-                            startDate = Date(child.child("startDate").child("time").value as Long)
-                        }
-                        var endDate : Date? = null;
-                        if (child.child("endDate").exists()){
-                            endDate = Date(child.child("endDate").child("time").value as Long)
-                        }
-                        var guid : UUID? = null
-                        if (child.child("guid").exists()){
-                            guid = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
-                        }
-                        var name = ""
-                        if (child.child("name").exists()){
-                            name  = child.child("name").value as String
-                        }
-                        route.userEmail = email
-                        route.name = name
-                        route.endDate = endDate
-                        route.startDate = startDate!!
-                        route.guid = guid
-                        route.setLocations(locations)
-                        route.setMarkers(markers)
-                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
-                        routes.add(route)
-                    }
-                    callback.callback(routes)
-                } else {
-                    callback.callback(mutableListOf())
-                }
-            }
-
-            override fun onCancelled(data: DatabaseError) {
-                println("Error occurred while reading users data")
-            }
-        }
-        database.getReference("/Routes/${user}").addValueEventListener(valueEventListener)
+    val user = User()
+    var callback : RoutesCallback? = null
+    set(value){
+        field = value
+        database.getReference("/Routes/${user.getUserEmailForDatabase()}").addValueEventListener(this)
     }
+
+
+//    fun getAll(callback: RoutesCallback, user : String){
+//        val valueEventListener = object : ValueEventListener {
+//            override fun onDataChange(data: DataSnapshot) {
+//                if (data.exists()) {
+//                    val routes = mutableListOf<TrackerModel>()
+//                    for (child in data.children) {
+//                        val route = TrackerModel()
+//                        val email: String =  child.child("userEmail").value.toString()
+//                        val locations = readLocations(child.child("locations"))
+//                        val markers_database = readLocations(child.child("markers"))
+//                        val markers = mutableMapOf<LatLng,Bitmap?>()
+//                        for (i in markers_database){
+//                            markers.put(i,null)
+//                        }
+//                        // val totalDistance : Double = child.child("totalDistance").value as Double
+//                        var startDate : Date = Calendar.getInstance().time
+//                        if (child.child("startDate").exists() && child.child("startDate").child("time").exists()){
+//                            startDate = Date(child.child("startDate").child("time").value as Long)
+//                        }
+//                        var endDate : Date? = null;
+//                        if (child.child("endDate").exists()){
+//                            endDate = Date(child.child("endDate").child("time").value as Long)
+//                        }
+//                        var guid : UUID? = null
+//                        if (child.child("guid").exists()){
+//                            guid = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
+//                        }
+//                        var name = ""
+//                        if (child.child("name").exists()){
+//                            name  = child.child("name").value as String
+//                        }
+//                        route.userEmail = email
+//                        route.name = name
+//                        route.endDate = endDate
+//                        route.startDate = startDate!!
+//                        route.guid = guid
+//                        route.setLocations(locations)
+//                        route.setMarkers(markers)
+//                        route.calculateDistance() // this should yield the same result as just setting the totaldistance
+//                        routes.add(route)
+//                    }
+//                    callback.callback(routes)
+//                } else {
+//                    callback.callback(mutableListOf())
+//                }
+//            }
+//
+//            override fun onCancelled(data: DatabaseError) {
+//                println("Error occurred while reading users data")
+//            }
+//        }
+//        database.getReference("/Routes/${user}").addValueEventListener(valueEventListener)
+//    }
 
     fun removeRoute(guid : UUID){
         val valueEventListener = object : ValueEventListener {
             override fun onDataChange(data: DataSnapshot) {
+                // remove roue
                 if (data.exists()){
                     data.ref.removeValue()
                 }
+                removeImages(guid)
             }
 
             override fun onCancelled(data: DatabaseError) {
                 println("Error occurred while reading users data")
             }
         }
-        val user = User()
         database.getReference("/Routes/${user.getUserEmailForDatabase()}/${guid.toString()}").addValueEventListener(valueEventListener)
+    }
+
+    private fun removeImages(guid: UUID) {
+        storage.getReference("/Images/${guid}").delete()
+            .addOnSuccessListener {
+                Log.d("Storage delete","Removed images succesfully")
+            }
+            .addOnFailureListener{
+                Log.d("storage delete", "Images deletion failed")
+            }
     }
 
     private fun decodeString(refName: String): LatLng {
@@ -111,7 +129,6 @@ class Database() {
     }
 
     fun writeRoute(route: TrackerModel) {
-        val user = User()
         val routeUser = database.getReference("/Routes").child(user.getUserEmailForDatabase())
 
         routeUser.child(route.guid.toString()).child("userEmail").setValue(route.userEmail)
@@ -154,4 +171,53 @@ class Database() {
         }
     }
 
+    override fun onDataChange(data: DataSnapshot) {
+        if (data.exists()) {
+            val routes = mutableListOf<TrackerModel>()
+            for (child in data.children) {
+                val route = TrackerModel()
+                val email: String =  child.child("userEmail").value.toString()
+                val locations = readLocations(child.child("locations"))
+                val markers_database = readLocations(child.child("markers"))
+                val markers = mutableMapOf<LatLng,Bitmap?>()
+                for (i in markers_database){
+                    markers.put(i,null)
+                }
+                // val totalDistance : Double = child.child("totalDistance").value as Double
+                var startDate : Date = Calendar.getInstance().time
+                if (child.child("startDate").exists() && child.child("startDate").child("time").exists()){
+                    startDate = Date(child.child("startDate").child("time").value as Long)
+                }
+                var endDate : Date? = null;
+                if (child.child("endDate").exists()){
+                    endDate = Date(child.child("endDate").child("time").value as Long)
+                }
+                var guid : UUID? = null
+                if (child.child("guid").exists()){
+                    guid = UUID(child.child("guid").child("mostSignificantBits").value as Long,child.child("guid").child("leastSignificantBits").value as Long )
+                }
+                var name = ""
+                if (child.child("name").exists()){
+                    name  = child.child("name").value as String
+                }
+                route.userEmail = email
+                route.name = name
+                route.endDate = endDate
+                route.startDate = startDate
+                route.guid = guid
+                route.setLocations(locations)
+                route.setMarkers(markers)
+                route.calculateDistance() // this should yield the same result as just setting the totaldistance
+                routes.add(route)
+            }
+            callback?.callback(routes)
+        } else {
+            callback?.callback(mutableListOf())
+        }
+    }
+
+    override fun onCancelled(error: DatabaseError) {
+        println("Error reading database")
+    }
 }
+

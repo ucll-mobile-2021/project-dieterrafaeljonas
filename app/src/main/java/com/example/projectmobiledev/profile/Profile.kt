@@ -71,7 +71,8 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        database.getAll(callback, controller.getUserDBEmail())
+        database.callback = callback;
+        //database.getAll(callback, controller.getUserDBEmail())
 
         /*
         ##############################
