@@ -47,7 +47,10 @@ class Home : AppCompatActivity() {
         setContentView(R.layout.home)
 
         val username : TextView = findViewById(R.id.username)
-        username.text = controller.getUserEmail()
+        username.text = "Welcome to your PromenApp, " + controller.getUserEmail() + "!"
+
+        val intro : TextView = findViewById(R.id.intro)
+        intro.text = "On this homepage, you will be able to see your planned routes and: add them to your calendar, open the route tracker for that route, or remove the planned routes. "
 
         recyclerView = findViewById(R.id.RecyclerViewHome)
 
