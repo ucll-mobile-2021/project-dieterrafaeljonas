@@ -37,6 +37,7 @@ dependencies {
     // dependencies voor google maps
     implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'com.google.firebase:firebase-auth:20.0.1'
     implementation 'com.google.android.gms:play-services-maps-license:12.0.1'
     testImplementation 'junit:junit:4.13.1'

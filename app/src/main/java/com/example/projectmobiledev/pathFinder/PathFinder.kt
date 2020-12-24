@@ -2,6 +2,7 @@ package com.example.projectmobiledev.pathFinder
 
 import `in`.blogspot.kmvignesh.googlemapexample.GoogleMapDTO
 import android.app.AlertDialog
+import android.app.SearchableInfo
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -76,9 +77,7 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private lateinit var storeButton: FloatingActionButton
     private lateinit var cancelButton : FloatingActionButton
     private lateinit var date : Date
-    private var day : Int = 1
-    private var month : Int = 1
-    private var year : Int = 2020
+    private var lookedUpOnce : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,41 +148,62 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         searchView = findViewById(R.id.sv_location)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextChange(p0: String?): Boolean {
-                //show suggestions
-                if (p0 != null || p0 != ""){
-                    geocoder = Geocoder(this@PathFinder)
-                    try{
-                        addresList = geocoder.getFromLocationName(p0,3)
-                    } catch (e : IOException){
-                        e.printStackTrace()
-                    }
-                }
                 return false
             }
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                if(p0 != null || p0 !="") {
+                if (!lookedUpOnce) {
+                    if (p0 != null || p0 != "") {
                         geocoder = Geocoder(this@PathFinder)
                         try {
                             addresList = geocoder.getFromLocationName(p0, 1)
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-                        address = addresList.get(0)
-                        positionFound = LatLng(address.latitude, address.longitude)
-                        pointFromForMethod = positionFound
-                        if (!searchResults.isEmpty()) {
-                            var marker = searchResults.last()
-                            marker.remove()
-                        }
-                        searchResults.add(
-                            map.addMarker(
-                                MarkerOptions().position(positionFound).title(p0)
+                        if(!addresList.isEmpty()) {
+                            address = addresList.get(0)
+                            positionFound = LatLng(address.latitude, address.longitude)
+                            pointFromForMethod = positionFound
+                            if (!searchResults.isEmpty()) {
+                                var marker = searchResults.last()
+                                marker.remove()
+                            }
+                            searchResults.add(
+                                map.addMarker(
+                                    MarkerOptions().position(positionFound).title(p0)
+                                )
                             )
-                        )
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
+                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(positionFound, 18f))
+                            firstPointSelected = true
+                            lookedUpOnce = true
+                            return true
+                        }
+                        else{
+                            val inflater = layoutInflater
+                            val popup = AlertDialog.Builder(this@PathFinder)
+                            val view = inflater.inflate(R.layout.look_up_alert2, null)
+                            popup.setView(view)
+                                .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
+                                    popup.dismiss()
+                                })
+                            popup.show()
+                        }
+                    }
+                    else{
+                        return false
+                    }
                 }
-                return true
+                else{
+                    val inflater = layoutInflater
+                    val popup = AlertDialog.Builder(this@PathFinder)
+                    val view = inflater.inflate(R.layout.look_up_alert, null)
+                    popup.setView(view)
+                        .setNegativeButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
+                            popup.dismiss()
+                        })
+                    popup.show()
+                }
+                return false
             }
         }
         )
