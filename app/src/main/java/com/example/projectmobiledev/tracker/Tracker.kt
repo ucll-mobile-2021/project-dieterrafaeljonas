@@ -154,13 +154,26 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     popup.setView(view)
                         .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
                             val textview = view.findViewById<EditText>(R.id.route_name)
-                            controller.setName(textview.text.toString())
-                            controller.stopTracking()
-                            //saveImages()
-                            controller.writeToDatabase()
-                            Log.d("DB", "Written to database")
-                            // redirect to home page
-                            startActivity(Intent(this, RoutesViewer::class.java));
+                            if(textview.text.toString() != null && textview.text.toString() != "") {
+                                controller.setName(textview.text.toString())
+                                controller.stopTracking()
+                                //saveImages()
+                                controller.writeToDatabase()
+                                Log.d("DB", "Written to database")
+                                // redirect to home page
+                                startActivity(Intent(this, RoutesViewer::class.java));
+                            }
+                            else
+                            {
+                                val inflater2 = layoutInflater
+                                val popup2 = AlertDialog.Builder(this)
+                                val view2 = inflater2.inflate(R.layout.no_name_given_error, null)
+                                popup2.setView(view2)
+                                    .setNegativeButton("Close",  DialogInterface.OnClickListener { popup2, _ ->
+                                        popup2.dismiss()
+                                    })
+                                popup2.show()
+                            }
                         })
                         .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
                             controller.stopTracking();
