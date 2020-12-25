@@ -1,6 +1,10 @@
 package com.example.projectmobiledev.login
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -41,6 +45,13 @@ class LogIn : AppCompatActivity() {
     }*/
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(!isOnline(this)){
+            val inflater = layoutInflater
+            val popup = AlertDialog.Builder(this)
+            val view = inflater.inflate(R.layout.internet_alert, null)
+            popup.setView(view)
+            popup.show()
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.log_in)
 
@@ -117,5 +128,28 @@ class LogIn : AppCompatActivity() {
 //        val user = User()
 //        database.getAll(callback, user.getUserEmailForDatabase())
         startActivity(Intent(logIn,Home::class.java))
+    }
+
+    //check for internet connection
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
