@@ -218,7 +218,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             controller.addLocation(LatLng(location.latitude, location.longitude))
             drawMap(controller.getAllLocations())
         }
-        else{
+        else if (!viewing){
             Toast.makeText(
                 this, "Location tracking not enabled, click on the play button to enable it",
                 Toast.LENGTH_SHORT
@@ -254,7 +254,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
     private val cameraOnClick = object : View.OnClickListener{
         override fun onClick(v: View?) {
-            val openCamera : Intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            val openCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             if (openCamera.resolveActivity(packageManager) != null){
                 startActivityForResult(openCamera, 0)
             }
