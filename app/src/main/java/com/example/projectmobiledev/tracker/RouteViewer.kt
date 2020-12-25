@@ -56,7 +56,9 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         routeInit()
-        //btnClose.setOnClickListener(goToHome)
+        btnClose.setOnClickListener {
+            startActivity(Intent(this, RoutesViewer::class.java))
+        }
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(9f)
         polyLineOptions.color(resources.getColor(R.color.colorAccent))

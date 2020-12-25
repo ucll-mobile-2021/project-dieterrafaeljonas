@@ -54,16 +54,18 @@ import java.util.*
 
 class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private lateinit var currentLocation : LatLng
+    lateinit var currentPhotoPath: String
+    private lateinit var currentLocation: LatLng
     private lateinit var map: GoogleMap
-    private lateinit var polyLineOptions : PolylineOptions
-    private lateinit var line : Polyline
-    private val controller : TrackerController = TrackerController()
-    private lateinit var locationProvider : FusedLocationProviderClient
+    private lateinit var polyLineOptions: PolylineOptions
+    private lateinit var line: Polyline
+    private val controller: TrackerController = TrackerController()
+    private lateinit var locationProvider: FusedLocationProviderClient
+
     // dialog for image popup
-    private lateinit var popupDialog : Dialog
-    private var tracking : Boolean = false
-    private var viewing : Boolean = false
+    private lateinit var popupDialog: Dialog
+    private var tracking: Boolean = false
+    private var viewing: Boolean = false
     private val route = TrackerModel()
 
     lateinit var toggle: ActionBarDrawerToggle
@@ -85,9 +87,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
         val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
-        if(Permissions.checkLocationPermission(this)){
+        if (Permissions.checkLocationPermission(this)) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
-        }else{
+        } else {
             Permissions.askLocationPermission(this);
         }
 
@@ -102,7 +104,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         //Clicks op menu items afhandelen
         nav_view.setNavigationItemSelectedListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.Home -> startActivity(Intent(this, Home::class.java))
                 R.id.Tracker -> startActivity(Intent(this, Tracker::class.java))
                 R.id.Profile -> startActivity(Intent(this, Profile::class.java))
@@ -116,72 +118,79 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             true
         }
 
-        btnStopTracking.setOnClickListener{
-            if (viewing){
+        btnStopTracking.setOnClickListener {
+            if (viewing) {
                 val popup = AlertDialog.Builder(this)
                 popup.setTitle("Are you sure you want to stop this promenade? You will no longer be able to take images on this route.")
+                val dialog = popup.create()
+                dialog.window?.setLayout(600, 400)
                 popup
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener{ popup, _ ->
+                    .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
                         route.end()
                         fixPoints()
                         val database = Database()
                         database.writeRoute(route)
                         startActivity(Intent(this, Home::class.java));
                     })
-                    .setNegativeButton("No",DialogInterface.OnClickListener{ popup, _ ->
-                        popup.dismiss()
-                    })
-                popup.show()
-            }
-            else{
-                if (tracking) {
-                val popup = AlertDialog.Builder(this)
-                val inflater = layoutInflater
-                val view = inflater.inflate(R.layout.save_route, null)
-                popup.setView(view)
-                    .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
-                        val textview = view.findViewById<EditText>(R.id.route_name)
-                        controller.setName(textview.text.toString())
-                        controller.stopTracking()
-                        controller.writeToDatabase()
-                        Log.d("DB", "Written to database")
-                        // redirect to home page
-                        startActivity(Intent(this, RoutesViewer::class.java));
-                    })
                     .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
-                        controller.stopTracking();
-                        // redirect to home page
-                        startActivity(Intent(this, RoutesViewer::class.java));
-                    })
-                    .setNeutralButton("Cancel", DialogInterface.OnClickListener{ popup, _ ->
                         popup.dismiss()
                     })
                 popup.show()
-            }else{
-                // add current point as starting point
-                controller.addLocation(currentLocation);
-                tracking = true;
-                startStopButton.setImageResource(R.drawable.stop_tracking)
-                controller.startTracking()
-            }
+            } else {
+                if (tracking) {
+                    val popup = AlertDialog.Builder(this)
+                    val inflater = layoutInflater
+                    val view = inflater.inflate(R.layout.save_route, null)
+                    popup.setView(view)
+                        .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
+                            val textview = view.findViewById<EditText>(R.id.route_name)
+                            controller.setName(textview.text.toString())
+                            controller.stopTracking()
+                            //saveImages()
+                            controller.writeToDatabase()
+                            Log.d("DB", "Written to database")
+                            // redirect to home page
+                            startActivity(Intent(this, RoutesViewer::class.java));
+                        })
+                        .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
+                            controller.stopTracking();
+                            // redirect to home page
+                            startActivity(Intent(this, RoutesViewer::class.java));
+                        })
+                        .setNeutralButton("Cancel", DialogInterface.OnClickListener { popup, _ ->
+                            popup.dismiss()
+                        })
+                    popup.show()
+                } else {
+                    // add current point as starting point
+                    controller.addLocation(currentLocation);
+                    tracking = true;
+                    startStopButton.setImageResource(R.drawable.stop_tracking)
+                    controller.startTracking()
+                }
             }
 
         }
 
     }
 
-    fun fixPoints(){
+    fun fixPoints() {
         // TODO fix points that are not on the route but are in markers
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (permissions.contentEquals(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION))) {
             if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 map.isMyLocationEnabled = true
                 updateCurrentLocation()
-                if (Permissions.checkLocationPermission(this)){ // geen idee waarom ik dit hier moet zetten want ik zit letterlijk in een PermissionResult callback :confused:
-                    val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+                if (Permissions.checkLocationPermission(this)) { // geen idee waarom ik dit hier moet zetten want ik zit letterlijk in een PermissionResult callback :confused:
+                    val locationManager: LocationManager =
+                        getSystemService(LOCATION_SERVICE) as LocationManager
                     locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
                         5000,
@@ -190,16 +199,21 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     )
                 }
             }
+            else if (permissions.contentEquals(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
+                if (requestCode == Permissions.WRITE_EXTERNAL_STORAGE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    saveImages()
+                }
+            }
         }
     }
 
     private fun updateCurrentLocation() {
-        if (Permissions.checkLocationPermission(this)){
+        if (Permissions.checkLocationPermission(this)) {
             //val location = locationProvider.getCurrentLocation(0,null)
             locationProvider.lastLocation.addOnSuccessListener(this)
             { location ->
-                if (location != null){
-                    val loc:LatLng = LatLng(location.latitude, location.longitude)
+                if (location != null) {
+                    val loc: LatLng = LatLng(location.latitude, location.longitude)
                     currentLocation = loc
                     startOnCurrentLocation()
                 }
@@ -207,18 +221,17 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         }
     }
 
-    private fun startOnCurrentLocation(){
-        if (Permissions.checkLocationPermission(this)){
+    private fun startOnCurrentLocation() {
+        if (Permissions.checkLocationPermission(this)) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 18f))
         }
     }
 
     override fun onLocationChanged(location: Location) {
-        if(tracking){
+        if (tracking) {
             controller.addLocation(LatLng(location.latitude, location.longitude))
             drawMap(controller.getAllLocations())
-        }
-        else if (!viewing){
+        } else if (!viewing) {
             Toast.makeText(
                 this, "Location tracking not enabled, click on the play button to enable it",
                 Toast.LENGTH_SHORT
@@ -237,7 +250,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         println(distance)
     }
 
-    override fun onMapReady(googleMap: GoogleMap){
+    override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         line = map.addPolyline(polyLineOptions)
         updateCurrentLocation()
@@ -248,14 +261,14 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         routeInit()
     }
 
-    private fun drawMap(points : List<LatLng>){
-        line.points = points.map{ location -> LatLng(location.latitude, location.longitude)  }
+    private fun drawMap(points: List<LatLng>) {
+        line.points = points.map { location -> LatLng(location.latitude, location.longitude) }
     }
 
-    private val cameraOnClick = object : View.OnClickListener{
+    private val cameraOnClick = object : View.OnClickListener {
         override fun onClick(v: View?) {
             val openCamera = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (openCamera.resolveActivity(packageManager) != null){
+            if (openCamera.resolveActivity(packageManager) != null) {
                 startActivityForResult(openCamera, 0)
             }
         }
@@ -263,7 +276,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        when(requestCode) {
+        when (requestCode) {
             0 -> {
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     // set the image in the imageView
@@ -272,10 +285,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     val marker = MarkerOptions()
                     marker.position(LatLng(currentLocation.latitude, currentLocation.longitude))
                     map.addMarker(marker)
-                    if (viewing){
+                    if (viewing) {
                         route.addMarker(currentLocation, image)
-                    }
-                    else{
+                    } else {
                         controller.addMarker(currentLocation, image)
                     }
 
@@ -292,11 +304,11 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onProviderEnabled(provider: String){
+    override fun onProviderEnabled(provider: String) {
         super.onProviderEnabled(provider)
     }
 
-    override fun onProviderDisabled(provider: String){
+    override fun onProviderDisabled(provider: String) {
         super.onProviderDisabled(provider)
     }
 
@@ -333,12 +345,14 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             val markers = controller.getAllMarkers()
             val markerlatLng: LatLng? = marker.position
             for (markerEntry in markers) {
-                if (markerEntry.key == markerlatLng){
+                if (markerEntry.key == markerlatLng) {
                     // found the right marker
                     // show image on popup
                     popupDialog.setContentView(R.layout.image_popup)
-                    popupDialog.findViewById<ImageView>(R.id.imagePopup).setImageBitmap(markerEntry.value)
-                    popupDialog.findViewById<ImageButton>(R.id.btnClose).setOnClickListener { popupDialog.dismiss() }
+                    popupDialog.findViewById<ImageView>(R.id.imagePopup)
+                        .setImageBitmap(markerEntry.value)
+                    popupDialog.findViewById<ImageButton>(R.id.btnClose)
+                        .setOnClickListener { popupDialog.dismiss() }
                     popupDialog.show()
                     return true
                 }
@@ -351,7 +365,7 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     private fun routeInit() {
         val routeJson = intent.extras?.getString("route")
         //val routeJson = intent.getStringExtra("route")
-        if (routeJson != null){
+        if (routeJson != null) {
             viewing = true
             // disable button
             val trackbutton = findViewById<FloatingActionButton>(R.id.btnStopTracking)
@@ -361,34 +375,81 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             route.userEmail = json.get("userEmail").asString
             var route_guid = json.get("guid").asString
             val locationString = json.getAsJsonPrimitive("route").asString
-            if (locationString != "[]"){
+            if (locationString != "[]") {
                 route.setLocations(readLocations(locationString))
             }
             val markerString = json.getAsJsonPrimitive("markers").asString
             route.name = json.get("name").asString
             route.startDate = Date(json.get("startDate").asLong)
+            // jonas zijn startdate fix
+            route.startDate = Calendar.getInstance().time
             route.calculateDistance()
             val msb = json.get("guid_msb").asLong
             val lsb = json.get("guid_lsb").asLong
-            val uuid = UUID(msb,lsb)
+            val uuid = UUID(msb, lsb)
             route.guid = uuid;
         }
         drawMap(route.getLocations())
     }
 
-    private fun readLocations(locations : String) : MutableList<LatLng> {
+    private fun readLocations(locations: String): MutableList<LatLng> {
         val result = mutableListOf<LatLng>()
         var locationString = locations
-        locationString = locationString.replace("[","")
-        locationString = locationString.replace("]","")
+        locationString = locationString.replace("[", "")
+        locationString = locationString.replace("]", "")
         val locations_ = locationString.split(",")
-        for (location in locations_){
+        for (location in locations_) {
             val latlng = location.split(";")
-            result.add(LatLng(latlng[0].toDouble(),latlng[1].toDouble()))
+            result.add(LatLng(latlng[0].toDouble(), latlng[1].toDouble()))
         }
         return result
     }
 
+    private fun saveImage(image: Bitmap, location: LatLng) {
+        // Hopelijk is dit collision proof
+            val fileName =
+                "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}.JPG"
+            val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            val file = File(storagedir, fileName)
+            try {
+                val stream: OutputStream = FileOutputStream(file)
+                image.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+                stream.flush()
+                stream.close()
+            } catch (e: Exception) {
+                print("#######################################################")
+                print(e.message)
+            }
+    }
 
+    fun saveImages(): Boolean {
+        if (Permissions.checkWriteExternalStoragePermission(this)) {
+            for ((k, v) in controller.getAllMarkers()) {
+                if (v != null)
+                    saveImage(v, k);
+            }
+            Log.d("Save", "Images Saved")
+            //Sreturn true
+        } else {
+            Permissions.askWriteExternalStoragePermission(this)
+            //return false
+        }
+        // list images
+        val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val list = storagedir?.list()
+        return true;
+    }
 
+    private fun createImageFile(location: LatLng): File {
+        // Create an image file name
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        ).apply {
+            // Save a file: path for use with ACTION_VIEW intents
+            currentPhotoPath = absolutePath
+        }
+    }
 }
