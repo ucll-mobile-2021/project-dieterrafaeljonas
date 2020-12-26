@@ -27,7 +27,10 @@ class TrackerModel()  {
         val user = User()
         userEmail = user.getUserEmail()
         startDate = Calendar.getInstance().time
-        name = startDate.toString();
+        val regex = Regex("([a-zA-Z]+\\s[a-zA-Z]+\\s\\d\\d)(.*)(\\d{4,}\$)")
+        val result = regex.find(startDate.toString())
+        val (date, time, year) = result!!.destructured
+        name = "$date $year"
     }
 
     fun end(){

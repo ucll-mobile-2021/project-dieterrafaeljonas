@@ -3,6 +3,7 @@ package com.example.projectmobiledev.tracker
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,6 +14,8 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.location.LocationProvider
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Environment
 import android.provider.ContactsContract
@@ -71,6 +74,13 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(!isOnline(this)){
+            val inflater = layoutInflater
+            val popup = AlertDialog.Builder(this)
+            val view = inflater.inflate(R.layout.internet_alert, null)
+            popup.setView(view)
+            popup.show()
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
 
@@ -150,6 +160,26 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                             Log.d("DB", "Written to database")
                             // redirect to home page
                             startActivity(Intent(this, RoutesViewer::class.java));
+                            if(textview.text.toString() != null && textview.text.toString() != "") {
+                                controller.setName(textview.text.toString())
+                                controller.stopTracking()
+                                //saveImages()
+                                controller.writeToDatabase()
+                                Log.d("DB", "Written to database")
+                                // redirect to home page
+                                startActivity(Intent(this, RoutesViewer::class.java));
+                            }
+                            else
+                            {
+                                val inflater2 = layoutInflater
+                                val popup2 = AlertDialog.Builder(this)
+                                val view2 = inflater2.inflate(R.layout.no_name_given_error, null)
+                                popup2.setView(view2)
+                                    .setNegativeButton("Close",  DialogInterface.OnClickListener { popup2, _ ->
+                                        popup2.dismiss()
+                                    })
+                                popup2.show()
+                            }
                         })
                         .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
                             controller.stopTracking();
@@ -397,5 +427,28 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             result.add(LatLng(latlng[0].toDouble(), latlng[1].toDouble()))
         }
         return result
+    }
+
+    //check for internet connection
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

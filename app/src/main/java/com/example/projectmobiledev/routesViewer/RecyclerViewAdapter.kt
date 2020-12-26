@@ -46,6 +46,7 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         holder.tijd.text = routes[position].elapsedTime.toString()
         holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " Km/h"
         holder.name.text = routes[position].name
+        holder.date.text = routes_db[position].startDate.date.toString()  + "/" + (routes_db[position].startDate.month+1).toString() + "/" + (routes_db[position].startDate.year + 1900).toString()
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             var intent = Intent(context, RouteViewer::class.java)
@@ -94,5 +95,6 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         var snelheid : TextView = itemView.findViewById(R.id.snelheid_txt)
         var name : TextView = itemView.findViewById(R.id.name)
         var remove : FloatingActionButton = itemView.findViewById(R.id.remove_route)
+        var date : TextView = itemView.findViewById(R.id.date)
     }
 }

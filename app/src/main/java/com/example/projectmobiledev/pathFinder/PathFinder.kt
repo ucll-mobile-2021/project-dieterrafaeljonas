@@ -254,10 +254,23 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             val timeView = view.findViewById<TimePicker>(R.id.timePicker1)
             popup.setView(view)
                 .setPositiveButton("Save", DialogInterface.OnClickListener { popup, _ ->
-                    date.hours = timeView.hour
-                    date.minutes = timeView.minute
-                    storeRoute(editText.text.toString(), date)
-                    startActivity(Intent(this, Home::class.java));
+                    if(editText.text.toString() != null && editText.text.toString() != "") {
+                        date.hours = timeView.hour
+                        date.minutes = timeView.minute
+                        storeRoute(editText.text.toString(), date)
+                        startActivity(Intent(this, Home::class.java))
+                    }
+                    else
+                    {
+                        val inflater2 = layoutInflater
+                        val popup2 = AlertDialog.Builder(this)
+                        val view2 = inflater2.inflate(R.layout.no_name_given_error, null)
+                        popup2.setView(view2)
+                            .setNegativeButton("Close",  DialogInterface.OnClickListener { popup2, _ ->
+                                popup2.dismiss()
+                            })
+                        popup2.show()
+                    }
                 })
                 .setNegativeButton("Cancel", DialogInterface.OnClickListener { popup, _ ->
                     popup.dismiss()
