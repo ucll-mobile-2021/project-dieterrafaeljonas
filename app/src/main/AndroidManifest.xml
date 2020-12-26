@@ -33,11 +33,14 @@
         </activity>
         <activity android:name=".tracker.Tracker"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".tracker.RouteViewer" />
-        <activity android:name=".profile.Profile" />
+        <activity android:name=".tracker.RouteViewer"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".profile.Profile"
+            android:screenOrientation="portrait"/>
         <activity android:name=".home.Home"
             android:screenOrientation="portrait"/>
-        <activity android:name=".pathFinder.PathFinder"/>
+        <activity android:name=".pathFinder.PathFinder"
+            android:screenOrientation="portrait"/>
         <activity android:name=".routesViewer.RoutesViewer"
             android:screenOrientation="portrait"/>
     </application>
