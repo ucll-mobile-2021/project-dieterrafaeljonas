@@ -108,12 +108,24 @@ class RoutesViewer : AppCompatActivity() {
     }
 
     fun setUp(routes: List<TrackerModel>) {
-        var new_routes = routes.sortedWith(compareBy { it.startDate })
-        new_routes = new_routes.filter { it.endDate != null }
-        for (route in new_routes) {
-                this.hikes.add(Route(route.getTotalDistance(), route.getElapsedTime(), route.getLocations(), route.name, route.guid))
+        // var new_routes = routes.sortedWith(compareBy { it.startDate })
+        // var new_routes = routes.filter { it.endDate != null }
+        this.hikes.clear()
+        for (route in routes) {
+            if (route.endDate != null) {
+                this.hikes.add(
+                    Route(
+                        route.getTotalDistance(),
+                        route.getElapsedTime(),
+                        route.getLocations(),
+                        route.name,
+                        route.guid,
+                        route.startDate
+                    )
+                )
+            }
         }
-        val adapter = RecyclerViewAdapter(this, hikes, new_routes)
+        val adapter = RecyclerViewAdapter(this, hikes, routes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
     }

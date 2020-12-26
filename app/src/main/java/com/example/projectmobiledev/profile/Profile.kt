@@ -191,7 +191,8 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
                     res.getElapsedTime(),
                     res.getLocations(),
                     res.name,
-                    res.guid
+                    res.guid,
+                    res.startDate
                 )
             }
         } else {

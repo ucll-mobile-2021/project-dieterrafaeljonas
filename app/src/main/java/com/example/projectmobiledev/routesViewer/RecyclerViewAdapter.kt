@@ -46,7 +46,7 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
         holder.tijd.text = routes[position].elapsedTime.toString()
         holder.snelheid.text = routes[position].computeSpeed().round(3).toString() + " Km/h"
         holder.name.text = routes[position].name
-        holder.date.text = routes_db[position].startDate.date.toString()  + "/" + (routes_db[position].startDate.month+1).toString() + "/" + (routes_db[position].startDate.year + 1900).toString()
+        holder.date.text = routes[position].startDate!!.date.toString()  + "/" + (routes[position].startDate!!.month+1).toString() + "/" + (routes[position].startDate!!.year + 1900).toString()
 
         holder.itemView.setOnClickListener(View.OnClickListener {
             var intent = Intent(context, RouteViewer::class.java)
@@ -61,7 +61,7 @@ class RecyclerViewAdapter : RecyclerView.Adapter<RecyclerViewAdapter.RecycleView
             builder.setMessage("Are you sure you want to remove this route?")
             builder.setPositiveButton("Yes", DialogInterface.OnClickListener{builder, _ ->
                 database.removeRoute(routes[position].guid!!)
-                context.startActivity(Intent(context, RoutesViewer::class.java))
+                // context.startActivity(Intent(context, RoutesViewer::class.java))
             })
             builder.setNegativeButton("No", DialogInterface.OnClickListener{builder, _ ->
                 builder.dismiss()
