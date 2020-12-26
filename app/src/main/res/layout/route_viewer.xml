@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="4dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:context=".tracker.RouteViewer" />
@@ -39,7 +39,7 @@
             android:id="@+id/txtDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="44dp"
             android:layout_marginBottom="32dp"
             android:text="TextView"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -72,8 +72,7 @@
             android:layout_height="23dp"
             android:layout_marginBottom="28dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/map"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintEnd_toStartOf="@+id/txtDistance"
             app:layout_constraintStart_toStartOf="parent"
             map:srcCompat="@drawable/ic_speed" />
 
