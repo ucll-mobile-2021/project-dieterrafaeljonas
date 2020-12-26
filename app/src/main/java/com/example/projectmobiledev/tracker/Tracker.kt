@@ -154,12 +154,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     popup.setView(view)
                         .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
                             val textview = view.findViewById<EditText>(R.id.route_name)
-                            controller.setName(textview.text.toString())
-                            controller.stopTracking()
-                            controller.writeToDatabase()
-                            Log.d("DB", "Written to database")
-                            // redirect to home page
-                            startActivity(Intent(this, RoutesViewer::class.java));
                             if(textview.text.toString() != null && textview.text.toString() != "") {
                                 controller.setName(textview.text.toString())
                                 controller.stopTracking()
