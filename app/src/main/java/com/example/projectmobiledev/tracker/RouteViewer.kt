@@ -31,7 +31,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.image_popup.*
+import kotlinx.android.synthetic.main.route_viewer.*
 import kotlinx.android.synthetic.main.tracker.*
+import kotlinx.android.synthetic.main.tracker.drawerLayout
+import kotlinx.android.synthetic.main.tracker.nav_view
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.*
@@ -56,7 +59,7 @@ class RouteViewer() : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarke
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         routeInit()
-        btnClose.setOnClickListener {
+        btnStopViewing.setOnClickListener {
             startActivity(Intent(this, RoutesViewer::class.java))
         }
         polyLineOptions = PolylineOptions()

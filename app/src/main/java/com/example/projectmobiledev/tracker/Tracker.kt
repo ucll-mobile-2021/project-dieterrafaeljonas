@@ -121,9 +121,9 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         btnStopTracking.setOnClickListener {
             if (viewing) {
                 val popup = AlertDialog.Builder(this)
-                popup.setTitle("Are you sure you want to stop this promenade? You will no longer be able to take images on this route.")
-                val dialog = popup.create()
-                dialog.window?.setLayout(600, 400)
+                val inflater = layoutInflater
+                val view = inflater.inflate(R.layout.end_routeviewer, null)
+                popup.setView(view)
                 popup
                     .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
                         route.end()
@@ -146,7 +146,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                             val textview = view.findViewById<EditText>(R.id.route_name)
                             controller.setName(textview.text.toString())
                             controller.stopTracking()
-                            //saveImages()
                             controller.writeToDatabase()
                             Log.d("DB", "Written to database")
                             // redirect to home page
@@ -197,11 +196,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         10.0f,
                         this
                     )
-                }
-            }
-            else if (permissions.contentEquals(arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE))) {
-                if (requestCode == Permissions.WRITE_EXTERNAL_STORAGE && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    saveImages()
                 }
             }
         }
@@ -403,53 +397,5 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             result.add(LatLng(latlng[0].toDouble(), latlng[1].toDouble()))
         }
         return result
-    }
-
-    private fun saveImage(image: Bitmap, location: LatLng) {
-        // Hopelijk is dit collision proof
-            val fileName =
-                "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}.JPG"
-            val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            val file = File(storagedir, fileName)
-            try {
-                val stream: OutputStream = FileOutputStream(file)
-                image.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-                stream.flush()
-                stream.close()
-            } catch (e: Exception) {
-                print("#######################################################")
-                print(e.message)
-            }
-    }
-
-    fun saveImages(): Boolean {
-        if (Permissions.checkWriteExternalStoragePermission(this)) {
-            for ((k, v) in controller.getAllMarkers()) {
-                if (v != null)
-                    saveImage(v, k);
-            }
-            Log.d("Save", "Images Saved")
-            //Sreturn true
-        } else {
-            Permissions.askWriteExternalStoragePermission(this)
-            //return false
-        }
-        // list images
-        val storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val list = storagedir?.list()
-        return true;
-    }
-
-    private fun createImageFile(location: LatLng): File {
-        // Create an image file name
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "PromenApp_${controller.getGuid()}_${location.latitude}_${location.longitude}", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
-        ).apply {
-            // Save a file: path for use with ACTION_VIEW intents
-            currentPhotoPath = absolutePath
-        }
     }
 }
