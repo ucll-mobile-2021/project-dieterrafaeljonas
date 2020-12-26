@@ -255,10 +255,23 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
             popup.setView(view)
                 .setPositiveButton("Save", DialogInterface.OnClickListener { popup, _ ->
                     if(editText.text.toString() != null && editText.text.toString() != "") {
-                        date.hours = timeView.hour
-                        date.minutes = timeView.minute
-                        storeRoute(editText.text.toString(), date)
-                        startActivity(Intent(this, Home::class.java))
+                        if(!routeToStore.isEmpty()) {
+                            date.hours = timeView.hour
+                            date.minutes = timeView.minute
+                            storeRoute(editText.text.toString(), date)
+                            startActivity(Intent(this, Home::class.java))
+                        }
+                        else
+                        {
+                            val inflater3 = layoutInflater
+                            val popup3 = AlertDialog.Builder(this)
+                            val view3 = inflater3.inflate(R.layout.no_points_on_path, null)
+                            popup3.setView(view3)
+                                .setNegativeButton("Close",  DialogInterface.OnClickListener { popup3, _ ->
+                                    popup3.dismiss()
+                                })
+                            popup3.show()
+                        }
                     }
                     else
                     {

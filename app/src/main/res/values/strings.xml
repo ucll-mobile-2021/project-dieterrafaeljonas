@@ -8,6 +8,7 @@
     <string name="no_internet_messsage">Sorry, you have no internet connection.</string>
     <string name="no_name_given_error_message">You have to specify the name first!</string>
     <string name="no_name_given_error">No name given!</string>
+    <string name="no_path_error">No points on this path!</string>
     <string-array name="pathfinder_methods">
         <item>driving</item>
         <item>walking</item>
