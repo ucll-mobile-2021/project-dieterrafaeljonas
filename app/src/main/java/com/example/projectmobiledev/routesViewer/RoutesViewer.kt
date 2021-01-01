@@ -23,6 +23,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projectmobiledev.Activity2
+import com.example.projectmobiledev.NetworkListener
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.Time
 import com.example.projectmobiledev.database.Database
@@ -50,13 +51,18 @@ class RoutesViewer : AppCompatActivity() {
     private lateinit var recyclerView : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
+//        if(!isOnline(this)){
+//            val inflater = layoutInflater
+//            val popup = AlertDialog.Builder(this)
+//            val view = inflater.inflate(R.layout.internet_alert, null)
+//            popup.setView(view)
+//            popup.show()
+//        }
+
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        val networkListener = NetworkListener(this,layoutInflater)
+        connectivityManager.registerDefaultNetworkCallback(networkListener)
+        
         super.onCreate(savedInstanceState)
         setContentView(R.layout.routes_overview)
 

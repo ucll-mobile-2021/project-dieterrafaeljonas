@@ -15,6 +15,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.location.LocationProvider
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Environment
@@ -28,6 +29,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.projectmobiledev.Activity2
+import com.example.projectmobiledev.NetworkListener
 import com.example.projectmobiledev.Permissions
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
@@ -74,15 +76,12 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
     lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tracker)
+
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        val networkListener = NetworkListener(this,layoutInflater)
+        connectivityManager.registerDefaultNetworkCallback(networkListener)
 
         val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
         popupDialog = Dialog(this)
@@ -194,7 +193,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
             }
 
         }
-
     }
 
     fun fixPoints() {
@@ -423,26 +421,5 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         return result
     }
 
-    //check for internet connection
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                    return true
-                }
-            }
-        }
-        return false
-    }
+
 }

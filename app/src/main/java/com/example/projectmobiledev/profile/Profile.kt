@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projectmobiledev.Activity2
+import com.example.projectmobiledev.NetworkListener
 import com.example.projectmobiledev.R
 import com.example.projectmobiledev.database.Database
 import com.example.projectmobiledev.database.RoutesCallback
@@ -50,13 +51,17 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var line : Polyline
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
+//        if(!isOnline(this)){
+//            val inflater = layoutInflater
+//            val popup = AlertDialog.Builder(this)
+//            val view = inflater.inflate(R.layout.internet_alert, null)
+//            popup.setView(view)
+//            popup.show()
+//        }
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        val networkListener = NetworkListener(this,layoutInflater)
+        connectivityManager.registerDefaultNetworkCallback(networkListener)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile)
 
