@@ -83,6 +83,13 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
     private var lookedUpOnce : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        if(!isOnline(this)){
+            val inflater = layoutInflater
+            val popup = AlertDialog.Builder(this)
+            val view = inflater.inflate(R.layout.internet_alert, null)
+            popup.setView(view)
+            popup.show()
+        }
         val connectivityManager = getSystemService(ConnectivityManager::class.java)
         val networkListener = NetworkListener(this,layoutInflater)
         connectivityManager.registerDefaultNetworkCallback(networkListener)
@@ -448,6 +455,28 @@ class PathFinder : AppCompatActivity(), OnMapReadyCallback,  ActivityCompat.OnRe
         trackerModelToStore.userEmail = user?.email!!
         trackerModelToStore.setLocations(routeToStore)
         database.writeRoute(trackerModelToStore)
+    }
+
+    private fun isOnline(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                    return true
+                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
+                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                    return true
+                }
+            }
+        }
+        return false
     }
 
 }
