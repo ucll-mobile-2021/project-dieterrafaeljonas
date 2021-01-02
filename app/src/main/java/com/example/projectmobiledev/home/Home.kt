@@ -2,6 +2,7 @@ package com.example.projectmobiledev.home
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -49,19 +50,14 @@ class Home : AppCompatActivity() {
     private lateinit var recyclerView : RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
         val connectivityManager = getSystemService(ConnectivityManager::class.java)
         val networkListener = NetworkListener(this,layoutInflater)
         connectivityManager.registerDefaultNetworkCallback(networkListener)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.home)
+
+        networkListener.isOnline(this)
 
         val username : TextView = findViewById(R.id.username)
         username.text = "Welcome to your PromenApp," + "\n" + controller.getUserEmail() + "!"
@@ -117,27 +113,5 @@ class Home : AppCompatActivity() {
         val adapter = RecyclerViewAdapterHome(this, new_routes, hikes)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-    }
-
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                    return true
-                }
-            }
-        }
-        return false
     }
 }
