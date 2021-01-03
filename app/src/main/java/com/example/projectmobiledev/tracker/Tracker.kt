@@ -83,6 +83,15 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         val networkListener = NetworkListener(this,layoutInflater)
         connectivityManager.registerDefaultNetworkCallback(networkListener)
         networkListener.isOnline(this)
+
+        val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+
+        if (Permissions.checkLocationPermission(this)) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
+        } else {
+            Permissions.askLocationPermission(this);
+        }
+
         val startStopButton = findViewById<FloatingActionButton>(R.id.btnStopTracking);
         popupDialog = Dialog(this)
         // setup map fragment and get notified when the map is ready to use
@@ -93,14 +102,6 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
         polyLineOptions = PolylineOptions()
         polyLineOptions.width(9f)
         polyLineOptions.color(resources.getColor(R.color.colorAccent))
-
-        val locationManager: LocationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
-        if (Permissions.checkLocationPermission(this)) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10.0f, this)
-        } else {
-            Permissions.askLocationPermission(this);
-        }
 
         btnCamera.setOnClickListener(cameraOnClick)
 
@@ -224,6 +225,20 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                         this
                     )
                 }
+            }
+            else if (requestCode == Permissions.LOCATION && grantResults[0] == PackageManager.PERMISSION_DENIED){
+                val popup = AlertDialog.Builder(this)
+                    .setPositiveButton("Okay, I will accept location permissions", DialogInterface.OnClickListener { _, _ ->
+                        Permissions.askLocationPermission(this)
+                    })
+                    .setNegativeButton("No, take me to home", DialogInterface.OnClickListener{
+                        _,_ ->
+                        startActivity(Intent(this, Home::class.java));
+                    }
+                    ).create()
+                popup.setTitle("You need location on for this feature to work")
+                popup.setCanceledOnTouchOutside(true)
+                popup.show()
             }
         }
     }
