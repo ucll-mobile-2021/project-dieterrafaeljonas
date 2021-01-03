@@ -153,49 +153,54 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     })
                 popup.show()
             } else {
-                if (tracking) {
-                    val popup = AlertDialog.Builder(this)
-                    val inflater = layoutInflater
-                    val view = inflater.inflate(R.layout.save_route, null)
-                    popup.setView(view)
-                        .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
-                            val textview = view.findViewById<EditText>(R.id.route_name)
-                            if(textview.text.toString() != null && textview.text.toString() != "") {
-                                controller.setName(textview.text.toString())
-                                controller.stopTracking()
-                                //saveImages()
-                                controller.writeToDatabase()
-                                Log.d("DB", "Written to database")
+                if (Permissions.checkLocationPermission(this)){
+                    if (tracking) {
+                        val popup = AlertDialog.Builder(this)
+                        val inflater = layoutInflater
+                        val view = inflater.inflate(R.layout.save_route, null)
+                        popup.setView(view)
+                            .setPositiveButton("Yes", DialogInterface.OnClickListener { popup, _ ->
+                                val textview = view.findViewById<EditText>(R.id.route_name)
+                                if(textview.text.toString() != null && textview.text.toString() != "") {
+                                    controller.setName(textview.text.toString())
+                                    controller.stopTracking()
+                                    //saveImages()
+                                    controller.writeToDatabase()
+                                    Log.d("DB", "Written to database")
+                                    // redirect to home page
+                                    startActivity(Intent(this, RoutesViewer::class.java));
+                                }
+                                else
+                                {
+                                    val inflater2 = layoutInflater
+                                    val popup2 = AlertDialog.Builder(this)
+                                    val view2 = inflater2.inflate(R.layout.no_name_given_error, null)
+                                    popup2.setView(view2)
+                                        .setNegativeButton("Close",  DialogInterface.OnClickListener { popup2, _ ->
+                                            popup2.dismiss()
+                                        })
+                                    popup2.show()
+                                }
+                            })
+                            .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
+                                controller.stopTracking();
                                 // redirect to home page
                                 startActivity(Intent(this, RoutesViewer::class.java));
-                            }
-                            else
-                            {
-                                val inflater2 = layoutInflater
-                                val popup2 = AlertDialog.Builder(this)
-                                val view2 = inflater2.inflate(R.layout.no_name_given_error, null)
-                                popup2.setView(view2)
-                                    .setNegativeButton("Close",  DialogInterface.OnClickListener { popup2, _ ->
-                                        popup2.dismiss()
-                                    })
-                                popup2.show()
-                            }
-                        })
-                        .setNegativeButton("No", DialogInterface.OnClickListener { popup, _ ->
-                            controller.stopTracking();
-                            // redirect to home page
-                            startActivity(Intent(this, RoutesViewer::class.java));
-                        })
-                        .setNeutralButton("Cancel", DialogInterface.OnClickListener { popup, _ ->
-                            popup.dismiss()
-                        })
-                    popup.show()
-                } else {
-                    // add current point as starting point
-                    controller.addLocation(currentLocation);
-                    tracking = true;
-                    startStopButton.setImageResource(R.drawable.stop_tracking)
-                    controller.startTracking()
+                            })
+                            .setNeutralButton("Cancel", DialogInterface.OnClickListener { popup, _ ->
+                                popup.dismiss()
+                            })
+                        popup.show()
+                    } else {
+                        // add current point as starting point
+                        controller.addLocation(currentLocation);
+                        tracking = true;
+                        startStopButton.setImageResource(R.drawable.stop_tracking)
+                        controller.startTracking()
+                    }
+                }
+                else{
+                    Permissions.askLocationPermission(this);
                 }
             }
 
@@ -305,15 +310,16 @@ class Tracker : AppCompatActivity(), LocationListener, OnMapReadyCallback, Googl
                     // set the image in the imageView
                     val image = data.extras?.get("data") as Bitmap
                     // only add the marker when the picture is actually taken
-                    val marker = MarkerOptions()
-                    marker.position(LatLng(currentLocation.latitude, currentLocation.longitude))
-                    map.addMarker(marker)
-                    if (viewing) {
-                        route.addMarker(currentLocation, image)
-                    } else {
-                        controller.addMarker(currentLocation, image)
+                    if (Permissions.checkLocationPermission(this)){
+                        val marker = MarkerOptions()
+                        marker.position(LatLng(currentLocation.latitude, currentLocation.longitude))
+                        map.addMarker(marker)
+                        if (viewing) {
+                            route.addMarker(currentLocation, image)
+                        } else {
+                            controller.addMarker(currentLocation, image)
+                        }
                     }
-
                 }
             }
             else -> throw IllegalStateException("Image error")
