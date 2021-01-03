@@ -45,18 +45,15 @@ class LogIn : AppCompatActivity() {
         startActivity(Intent(this, Tracker::class.java))
     }*/
 
+    override fun onBackPressed() {
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
         val connectivityManager = getSystemService(ConnectivityManager::class.java)
         val networkListener = NetworkListener(this,layoutInflater)
         connectivityManager.registerDefaultNetworkCallback(networkListener)
-
+        networkListener.isOnline(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.log_in)
 
@@ -133,27 +130,5 @@ class LogIn : AppCompatActivity() {
 //        val user = User()
 //        database.getAll(callback, user.getUserEmailForDatabase())
         startActivity(Intent(logIn,Home::class.java))
-    }
-
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                    return true
-                }
-            }
-        }
-        return false
     }
 }

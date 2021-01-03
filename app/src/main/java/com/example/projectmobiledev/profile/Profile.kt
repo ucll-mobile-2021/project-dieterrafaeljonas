@@ -51,17 +51,10 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var line : Polyline
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        if(!isOnline(this)){
-            val inflater = layoutInflater
-            val popup = AlertDialog.Builder(this)
-            val view = inflater.inflate(R.layout.internet_alert, null)
-            popup.setView(view)
-            popup.show()
-        }
         val connectivityManager = getSystemService(ConnectivityManager::class.java)
         val networkListener = NetworkListener(this,layoutInflater)
         connectivityManager.registerDefaultNetworkCallback(networkListener)
-
+        networkListener.isOnline(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile)
 
@@ -219,27 +212,5 @@ class Profile : AppCompatActivity(), OnMapReadyCallback {
             line.points = route.locations
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(route.getRouteCenter(), 18.0f))
         }
-    }
-
-    private fun isOnline(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager != null) {
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-            if (capabilities != null) {
-                if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
-                    return true
-                } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)) {
-                    Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
-                    return true
-                }
-            }
-        }
-        return false
     }
 }
